@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FWB Tab Nav Menu Mockup (Dynamic Width)</title>
+<style>
+  :root {
+    --teal: #1b8c7c; --teal-2: #3aab9a; --teal-soft: #dff3ee;
+    --ink: #1f1f1f; --ink-2: #595959; --ink-3: #8c8c8c;
+    --line: #e3e3e3; --bg: #f4f4f4; --side: #333; --red: #e5484d; --green: #2fb65a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Noto Sans TC","PingFang HK","Microsoft JhengHei","Noto Sans",Arial,sans-serif;
+    font-size: 13px; color: var(--ink); background: var(--bg); display: flex; min-height: 100vh; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  button:focus-visible, summary:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 2px; }
+  small, .unit { font-size: 10px; color: var(--ink-2); font-weight: 400; }
+  .muted { color: var(--ink-3); }
+  svg.i { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; flex-shrink: 0; vertical-align: -2px; }
+
+  /* ---------- Side bar ---------- */
+  .side { width: 72px; background: var(--side); color: #fff; flex-shrink: 0; display: flex; flex-direction: column;
+    position: sticky; top: 0; left: 0; height: 100vh; align-self: flex-start; overflow-y: auto; z-index: 40; }
+  .side .logo { padding: 14px 0 12px; text-align: center; font-size: 9px; line-height: 1.3; font-weight: 700; border-bottom: 1px solid #4a4a4a; }
+  .side .item { padding: 12px 0; text-align: center; font-size: 10px; }
+  .side .item.on { background: #474747; color: #6fd3c2; }
+  .side svg { display: block; margin: 0 auto 4px; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+  .side .bottom { margin-top: auto; border-top: 1px solid #4a4a4a; }
+
+  /* ---------- Top bar ---------- */
+  .main { flex: 1; min-width: 1130px; display: flex; flex-direction: column; }
+  .topbar { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 20px; position: sticky; top: 0; z-index: 31; background: var(--bg); }
+  .topbar .title { font-size: 17px; font-weight: 700; }
+  .topbar .spacer { flex: 1; }
+  .search { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 4px; height: 32px; background: #fff; }
+  .search .seg { padding: 0 10px; border-right: 1px solid var(--line); height: 100%; display: flex; align-items: center; gap: 8px; }
+  .search .ph { padding: 0 10px; color: #bbb; width: 150px; }
+  .search kbd { font: inherit; font-size: 9px; color: var(--ink-3); border: 1px solid var(--line); border-radius: 3px; padding: 1px 4px; margin-right: 4px; }
+  .search .plus { border-left: 1px solid var(--line); height: 100%; width: 32px; display: grid; place-items: center; font-size: 18px; color: var(--ink-2); }
+  .user { text-align: right; font-size: 12px; line-height: 1.3; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; }
+
+  /* ---------- Tab nav + mega menu ---------- */
+  .nav { position: sticky; top: 64px; z-index: 30; padding: 0 20px; background: var(--bg); }
+  .tabs { display: flex; align-items: center; border-bottom: 1px solid #d5d5d5; }
+  .tab { position: relative; height: 42px; padding: 0 13px; display: flex; align-items: center; gap: 8px; color: var(--ink-3); font-size: 14px; font-weight: 500; white-space: nowrap; }
+  .tab::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
+  .tab.active, .tab.open { color: var(--teal); font-weight: 700; }
+  .tab.active::after, .tab.open::after { background: var(--teal); }
+  .tab .chev { width: 10px; height: 10px; fill: none; stroke: var(--ink); stroke-width: 1.6; transition: transform .15s; }
+  .tab.open .chev { transform: rotate(180deg); }
+  .tabs .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .mega { position: absolute; left: 20px; width: max-content; top: 100%; z-index: 20; background: #fff; box-shadow: 0 8px 16px rgba(0,0,0,.16); display: none; }
+  .mega.show { display: grid; }  /* Dynamic width: N menu columns + quick links, all equal (set in renderMega) */
+  .mega .cols { display: contents; }
+  .mega .cols > div { padding: 22px 12px 26px 40px; }
+  .mega .quick { padding-left: 36px !important; border-left: 1px solid var(--line); padding: 22px 24px 26px; }
+  .mega .quick h6 { font-size: 11px; font-weight: 400; color: var(--ink-2); margin-bottom: 10px; }
+  .group + .group { margin-top: 14px; }
+  .l2 { display: block; font-size: 14px; font-weight: 700; padding: 3px 0; text-align: left; }
+  span.l2 { cursor: default; }
+  button.l2:hover, .l3:hover, .ql:hover { color: var(--teal); }
+  .l3 { display: block; font-size: 13px; color: var(--ink-3); padding: 5px 0; text-align: left; }
+  .l3.current, button.l2.current { color: var(--teal); font-weight: 700; }
+  .ql { display: flex; align-items: center; gap: 8px; font-weight: 500; padding: 5px 0; }
+  .ql svg { color: var(--teal); }
+
+  /* ---------- Pills ---------- */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 20px 0; }
+  .pills:empty { display: none; }
+  .pill { border: 1px solid #cfcfcf; border-radius: 999px; padding: 5px 14px; font-weight: 700; color: var(--ink-2); }
+  .pill:hover { border-color: var(--teal); color: var(--teal); }
+  .pill.current { background: var(--teal); border-color: var(--teal); color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+
+  /* ---------- Generic blocks ---------- */
+  .content { padding: 14px 20px 28px; flex: 1; }
+  .layout { display: grid; gap: 16px; align-items: start; grid-template-columns: 280px minmax(0,1fr); }
+  .layout.three { grid-template-columns: 280px minmax(0,1fr) 250px; }
+  .stack > * + * { margin-top: 12px; }
+  .card { background: #fff; border-radius: 6px; padding: 18px 20px; }
+  .card.flush { padding: 0; }
+  h2 { font-size: 20px; } h3 { font-size: 15px; } h4 { font-size: 14px; }
+  .btn { border: 1px solid #d0d0d0; background: #fff; border-radius: 3px; padding: 5px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; vertical-align: middle; }
+  td.r { white-space: nowrap; }
+  .btn:hover { border-color: var(--teal); color: var(--teal); }
+  .btn.primary { background: var(--teal); border-color: var(--teal); color: #fff; font-weight: 700; }
+  .btn.primary:hover { color: #fff; filter: brightness(1.08); }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { justify-content: space-between; }
+  .num { font-size: 18px; font-weight: 500; }
+  .label { color: var(--ink-3); font-size: 12px; margin-bottom: 4px; }
+  .count { background: var(--teal-soft); color: var(--teal); border-radius: 8px; font-size: 10px; padding: 1px 6px; font-weight: 700; }
+  .tag { display: inline-block; border-radius: 999px; padding: 2px 10px; background: #eee; font-size: 12px; font-weight: 500; }
+  .tag.gold { background: #f1e4c4; color: #8a6a1d; }
+  .tag.ok { background: #dcf5e3; color: #1f9d48; } .tag.bad { background: #fde1e0; color: #d93a35; }
+  .tag.warn { background: #fdeed3; color: #c77a05; } .tag.teal { background: var(--teal-soft); color: var(--teal); }
+  .tag.off { background: #f2f2f2; color: #c4c4c4; }
+  .okdot { display: inline-grid; place-items: center; width: 13px; height: 13px; border-radius: 50%; background: var(--teal-2); color: #fff; font-size: 9px; vertical-align: -1px; }
+  .okdot.no { background: #cfcfcf; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; font-weight: 700; color: var(--ink-2); padding: 10px 12px; border-bottom: 1px solid #d5d5d5; white-space: nowrap; }
+  td { padding: 12px; vertical-align: middle; }
+  tbody tr:nth-child(even) { background: #fafafa; }
+  .r { text-align: right; }
+  .pager { display: flex; align-items: center; gap: 16px; padding: 14px 16px; color: var(--ink-2); border-top: 1px solid var(--line); }
+  .pager .pg { margin-left: auto; display: flex; gap: 18px; align-items: center; }
+  .pager .cur { background: var(--teal-2); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
+  .pager .box { width: 28px; height: 20px; border: 1px solid var(--line); border-radius: 3px; background: #fff; display: inline-block; vertical-align: middle; margin: 0 6px; }
+
+  /* ---------- Customer profile panel ---------- */
+  .profile { background: #fff; border-radius: 6px; }
+  .profile section { padding: 18px 20px; border-top: 1px solid var(--line); }
+  .profile section:first-child { border-top: 0; }
+  .profile h4 { margin-bottom: 10px; }
+  .who { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .who .pic { width: 42px; height: 42px; border-radius: 50%; background: #dccfa6; display: grid; place-items: center; color: #fff; }
+  .who .pic svg { width: 26px; height: 26px; fill: #fff; }
+  .who b { font-size: 17px; display: block; line-height: 1.2; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .btn.wide { width: 100%; justify-content: center; padding: 6px; }
+  .kv { display: grid; grid-template-columns: 108px 1fr; gap: 7px 0; }
+  .kv dt { color: var(--ink-3); font-size: 11px; align-self: center; }
+  .contact { display: grid; grid-template-columns: 24px 1fr 16px; gap: 8px 6px; align-items: start; color: var(--ink-3); }
+  .contact span { color: var(--ink); }
+
+  /* ---------- Charts ---------- */
+  .dist { display: flex; gap: 28px; align-items: flex-start; margin-top: 14px; }
+  .pie { width: 210px; height: 210px; border-radius: 50%; flex-shrink: 0; }
+  .dist table { flex: 1; }
+  .dist td { padding: 9px 8px; } .dist tbody tr { background: none; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 12px; }
+  .subtabs { display: grid; grid-template-columns: 1fr 1fr; background: #ebebeb; border-radius: 6px 6px 0 0; }
+  .subtabs div { text-align: center; padding: 12px; font-size: 14px; font-weight: 700; color: var(--ink-3); border-bottom: 2px solid #d5d5d5; }
+  .subtabs .on { background: #fff; color: var(--teal); border-bottom-color: var(--teal); border-radius: 6px 6px 0 0; }
+  .list { border: 1px solid #eee; border-radius: 4px; margin-top: 12px; }
+  .list .li { display: grid; grid-template-columns: 40px 1fr 110px 60px; align-items: center; padding: 12px 16px; }
+  .list .li:nth-child(even) { background: #fafafa; }
+
+  /* ---------- Right-hand accordions ---------- */
+  details.acc { background: #fff; border-radius: 6px; }
+  details.acc > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 14px 16px; font-size: 14px; font-weight: 700; }
+  details.acc > summary::-webkit-details-marker { display: none; }
+  details.acc > summary::after { content: ""; margin-left: auto; width: 7px; height: 7px; border-right: 1.6px solid var(--ink); border-bottom: 1.6px solid var(--ink); transform: rotate(45deg); }
+  details.acc[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+  details.acc > summary .btn { margin-left: auto; font-weight: 400; }
+  details.acc > summary .btn + * , details.acc > summary:has(.btn)::after { margin-left: 8px; }
+  .acc .it { padding: 10px 16px; border-top: 3px solid var(--bg); }
+  .acc .it b { display: block; font-weight: 500; }
+  .acc .al { display: grid; grid-template-columns: 30px 1fr; padding: 10px 16px; border-top: 1px solid #eee; align-items: center; }
+  .acc .al b { font-weight: 500; display: block; } .acc .al small { font-size: 9px; }
+  .acc .body { padding: 4px 16px 14px; color: var(--ink-3); }
+  .tick { color: var(--green); font-size: 15px; } .cross { color: var(--red); font-size: 15px; }
+
+  /* ---------- Fund accounts ---------- */
+  details.acct { background: #fff; border: 1px solid #e6e6e6; border-radius: 8px; }
+  details.acct > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr 1fr 24px; align-items: center; padding: 14px 20px; }
+  details.acct > summary::-webkit-details-marker { display: none; }
+  details.acct > summary > div + div { border-left: 1px solid var(--line); padding-left: 14px; }
+  details.acct > summary::after { content: ""; width: 7px; height: 7px; border-right: 1.6px solid var(--ink); border-bottom: 1.6px solid var(--ink); transform: rotate(45deg); }
+  details.acct[open] > summary::after { transform: rotate(-135deg); }
+  details.acct .inner { background: #fafafa; padding: 20px; border-radius: 0 0 8px 8px; }
+  .up { color: var(--green); } .down { color: var(--red); }
+  .toggle { width: 34px; height: 18px; border-radius: 9px; background: #ddd; position: relative; display: inline-block; }
+  .toggle::after { content: ""; position: absolute; left: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+
+  /* ---------- Portfolio analysis ---------- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .mini { min-height: 110px; }
+  .mini .hd, .lst .hd { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; margin-bottom: 18px; }
+  .mini .hd::after { content: "›"; margin-left: auto; font-weight: 400; font-size: 16px; }
+  .lst { padding: 0 0 18px; } .lst .hd { padding: 16px 16px 0; }
+  .lst .ln { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #e2e2e2; font-size: 11px; font-weight: 500; }
+  .stackbar { width: 44px; height: 46px; display: flex; flex-direction: column; margin-left: auto; }
+  .filter { border: 1px solid var(--line); background: #fff; border-radius: 3px; padding: 6px 10px; width: 140px; color: #bbb; display: inline-flex; justify-content: space-between; }
+  .placeholder { min-height: 280px; display: grid; place-items: center; border: 1px dashed #cfcfcf; border-radius: 6px; background: #fafafa; color: var(--ink-3); }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 8px 16px; border-radius: 4px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 50; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="logo">
+    <svg style="width:28px;height:28px;stroke:#c8102e;stroke-width:2.4" viewBox="0 0 26 26"><circle cx="13" cy="13" r="10.5"/><rect x="9" y="9.5" width="8" height="7" rx="1"/><path d="M13 2.5v7M13 16.5v7"/></svg>
+    前綫<br>一站式平台
+  </div>
+  <div class="item on"><svg viewBox="0 0 20 20"><path d="M3 9l7-6 7 6v8H3z" fill="currentColor"/></svg>首頁</div>
+  <div class="item"><svg viewBox="0 0 20 20"><circle cx="8" cy="7" r="3.5"/><path d="M2 17c0-3.5 2.5-5.5 6-5.5s6 2 6 5.5M13 4a3.5 3.5 0 0 1 0 6.5M16 12c1.500 1 2.200 2.600 2.200 5"/></svg>我的客盤</div>
+  <div class="item"><svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="6.5"/><path d="M14 14l4 4"/><circle cx="9" cy="7.500" r="2"/><path d="M5.500 12.500c.8-1.500 2-2 3.500-2s2.700.5 3.500 2"/></svg>客戶挖潛</div>
+  <div class="item"><svg viewBox="0 0 20 20"><path d="M10 2a5.500 5.500 0 0 0-3 10v2h6v-2a5.500 5.500 0 0 0-3-10zM8 17.500h4"/></svg>銷售線索</div>
+  <div class="item"><svg viewBox="0 0 20 20"><rect x="2.500" y="6" width="15" height="11" rx="1"/><path d="M7 6V3h6v3M7 6v11M13 6v11"/></svg>商機</div>
+  <div class="item"><svg viewBox="0 0 20 20"><rect x="2.500" y="4" width="15" height="13" rx="1"/><path d="M2.500 8h15M6 2v3M14 2v3M6 12h2M11 12h3"/></svg>活動</div>
+  <div class="item bottom"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="5" height="5" rx="2"/><rect x="12" y="3" width="5" height="5" rx="2"/><rect x="3" y="12" width="5" height="5" rx="2"/><rect x="12" y="12" width="5" height="5" rx="2"/></svg>其他系統</div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <svg class="i" viewBox="0 0 14 14" style="stroke-width:1.6;color:#595959"><path d="M9 2L4 7l5 5"/></svg>
+    <div class="title">吳浩康 Ng Ho Hong</div>
+    <div class="spacer"></div>
+    <div class="search">
+      <div class="seg">個人客戶 <svg class="i" style="width:9px" viewBox="0 0 10 10"><path d="M2 3.500l3 3 3-3"/></svg></div>
+      <div class="ph">搜尋客戶</div><kbd>Ctrl</kbd><kbd>E</kbd>
+      <div class="plus">+</div>
+    </div>
+    <div class="user">馬小玲<br><small>#7247391</small></div>
+    <div class="avatar">馬</div>
+  </header>
+
+  <nav class="nav" id="nav">
+    <div class="tabs" id="tabs"></div>
+    <div class="mega" id="mega"></div>
+  </nav>
+  <div class="pills" id="pills"></div>
+  <main class="content" id="content"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====== Menu data (edit here to iterate) ======
+   A Level 2 group with `children` is an unclickable heading; without children it is a clickable page.
+   `short` = the name shown in the tab label once you are inside that group (e.g. 銷售流程及服務：投資組合分析). */
+const MENU = [   // Dynamic width version (IA per cus_profile_nav_DynamicWidth)
+  { label: "客戶概覽" },
+  { label: "持有產品",
+    cols: [
+      [{ label: "存款" }, { label: "保險", children: ["壽險", "產險"] }, { label: "貸款/按揭" }, { label: "信用卡" }],
+      [{ label: "投資", children: ["投資概覽", "基金", "債券/存款證", "證券", "股票掛鈎投資/結構性票據", "外匯掛鈎投資", "貴金屬及外匯孖展", "貴金屬存摺賬戶"] }]
+    ],
+    quick: [{ label: "資產組合報表", icon: "download" }] },
+  { label: "詳細資料",
+    cols: [
+      [{ label: "客戶資料" }, { label: "相連客戶" }, { label: "附註" }],
+      [{ label: "手機銀行動態", children: ["手機銀行足跡", "自設外匯到價提示"] }]
+    ],
+    quick: [{ label: "建立附註", icon: "edit" }] },
+  { label: "客戶關係管理",
+    cols: [
+      [{ label: "聯絡記錄", children: ["電話/面談", "直銷渠道", "客聯渠道"] }],
+      [{ label: "銷售線索", children: ["Must do", "行銷活動", "分行行銷活動", "自設客戶列表"] }],
+      [{ label: "商機", children: ["我的商機", "過往商機"] }, { label: "預約活動" }, { label: "客戶動態" }]
+    ],
+    quick: [{ label: "建立活動記錄", icon: "edit" }, { label: "安排預約活動", icon: "calendar" }, { label: "新增商機", icon: "case" }] },
+  { label: "銷售流程及服務",
+    cols: [
+      [{ label: "銷售流程", children: ["壽險銷售", "投資銷售", "外匯交易"] }],
+      [{ label: "投資組合分析及建議", short: "投資組合分析", children: ["投資組合概覽", "投資組合分析", "簡報草稿", "建議提案記錄"] }]
+    ],
+    quick: [{ label: "更新QIP", icon: "edit" }, { label: "準備投資簡報", icon: "chart" }, { label: "生成建議提案", icon: "edit" }] }
+];
+
+const ICONS = {
+  download: '<path d="M7 2v7M4 6.500L7 9.500l3-3M2.500 11.500h9"/>',
+  edit: '<rect x="2" y="2" width="10" height="10" rx="1.500"/><path d="M5 8.500l1.800-.3L10 5 9 4 5.800 7.200z"/>',
+  calendar: '<rect x="2" y="3" width="10" height="9" rx="1.500"/><path d="M2 6h10M5 2v2M9 2v2"/>',
+  case: '<rect x="2" y="4.500" width="10" height="7.500" rx="1.500"/><path d="M5 4.500V3h4v1.500"/>',
+  chart: '<path d="M2 12V5M6 12V2M10 12V7"/>',
+  copy: '<rect x="4.500" y="2" width="7" height="8" rx="1"/><path d="M2.500 5v7h6"/>',
+  phone: '<path d="M3 2h2.500l1 3-1.500 1a7 7 0 0 0 3 3l1-1.500 3 1V11a1.500 1.500 0 0 1-1.500 1.500A9.500 9.500 0 0 1 2 3.500 1.500 1.500 0 0 1 3 2z"/>',
+  mail: '<rect x="1.500" y="3" width="11" height="8" rx="1"/><path d="M1.500 4l5.500 4 5.500-4"/>',
+  pin: '<path d="M7 12.500S3 8.500 3 5.500a4 4 0 0 1 8 0c0 3-4 7-4 7z"/><circle cx="7" cy="5.500" r="1.300"/>',
+  swap: '<path d="M11.500 7a4.500 4.500 0 0 1-8 2.800M2.500 7a4.500 4.500 0 0 1 8-2.800M10.500 2v2.300H8.200M3.500 12V9.700h2.300"/>',
+  clock: '<circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 1.500"/>',
+  chat: '<rect x="1.500" y="2.500" width="11" height="7.500" rx="1"/><path d="M4 12.500l2-2.500"/>',
+  walk: '<circle cx="4.500" cy="4" r="1.800"/><path d="M4.500 7v5M10 3v6M10 11v.500"/>',
+  star: '<circle cx="6" cy="4.500" r="2.800"/><path d="M1.500 12.500c0-2.500 2-4 4.500-4M10.500 8.500l.8 1.600 1.700.2-1.200 1.200.3 1.700-1.600-.8-1.500.8.300-1.700L8 10.300l1.700-.2z"/>',
+  horn: '<path d="M2 5.500h2.500L10 2.500v9L4.500 8.500H2zM4.500 8.500V12h2V9.500"/>',
+  info: '<circle cx="7" cy="7" r="5"/><path d="M7 6.500V10M7 4.300v.4"/>',
+  inbox: '<rect x="2" y="3" width="10" height="9" rx="1"/><path d="M2 6h10M7 7.500v3M5.500 9.200L7 10.700l1.500-1.500"/>'
+};
+const I = n => `<svg class="i" viewBox="0 0 14 14">${ICONS[n] || ICONS.edit}</svg>`;
+const CHEV = '<svg class="chev" viewBox="0 0 10 10"><path d="M2 3.500l3 3 3-3"/></svg>';
+const OK = '<span class="okdot">✓</span>';
+const hkd = (v, u = "HKD") => `${v} <span class="unit">${u}</span>`;
+
+/* ====== Shared page parts ====== */
+const kv = rows => `<dl class="kv">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>`;
+
+const WHO = `
+  <div class="who"><div class="pic"><svg viewBox="0 0 26 26"><circle cx="13" cy="9" r="5"/><path d="M3 24c1-6 5-8 10-8s9 2 10 8z"/></svg></div>
+    <div><b>吳浩康</b><span style="font-weight:700">Ng Ho Hong</span><br>#7200245714 <span class="muted">${I("copy")}</span></div></div>
+  <div class="tags"><span class="tag gold">私人財富</span><span class="tag">專業投資者</span><span class="tag">理財通北向客戶</span></div>
+  <button class="btn wide">${I("swap")}切換聯名組合</button>`;
+
+const RISK = [["投資風險取向", "4 - 中度進取"], ["上次 QIP 日期", "2023/03/21"], ["QIP 到期日", "2025/02/08"]];
+const ADDR = "C室, 15/F, Block 5, 源順圍3號,<br>大埔, 新界, 香港";
+
+const profile = () => `<aside class="profile">
+  <section>${WHO}</section>
+  <section><h4>客戶簡介</h4>${kv([["性別", "男性"], ["出生日期 (年齡)", "1984/01/01 (41)"], ["證件編號", "D3283728(2)"], ["教育程度", "大學專科教育"], ["婚姻狀況", "已婚"], ["國籍 (國家/地區)", "HK"], ["VC表徵", "低學歷"]])}</section>
+  <section><h4>聯繫方式</h4><div class="contact">
+    ${I("phone")}<span>+852 64738298</span>${I("copy")}
+    ${I("mail")}<span>deep.ng@mail.com</span>${I("copy")}
+    ${I("inbox")}<span>${ADDR}</span>${I("copy")}
+    ${I("pin")}<span>${ADDR}</span>${I("copy")}</div></section>
+  <section><h4>風險評估</h4>${kv([...RISK, ["投資者-交易經驗", OK], ["投資者-培訓", OK], ["投資者-工作經驗", OK]])}</section>
+  <section><h4>僱主/公司資料</h4>${kv([["行業分類", "物流/ 運輸"], ["職業分類", "經理"], ["公司名稱", "藍天物流有限公司"], ["預計月薪", `${hkd("130,000")} - ${hkd("170,000")}`]])}</section>
+  <section><h4>內部資料</h4>${kv([["跟進分行", "旺角分行｜586"], ["客戶經理", "吳家明 #6314739"]])}</section>
+</aside>`;
+
+const pie = items => {
+  let acc = 0;
+  const stops = items.map(([, , p, c]) => { const s = `${c} ${acc}% ${acc + p}%`; acc += p; return s; });
+  return `<div class="pie" style="background:conic-gradient(${stops.join(",")})"></div>`;
+};
+const dist = (items, h1, h2) => `<div class="dist">${pie(items)}
+  <table><thead><tr><th>${h1}</th><th class="r">${h2}</th><th class="r">%</th></tr></thead><tbody>
+  ${items.map(([n, v, p, c]) => `<tr><td><span class="sw" style="background:${c}"></span>${n}</td><td class="r"><b style="font-weight:500">${hkd(v)}</b></td><td class="r">${p.toFixed(1)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+
+const HEALTH = [["投資組合風險不匹配", "風險水平較高，需留意是否符合客戶情況", 0], ["相對於基準追蹤誤差", "與策略配置有差距，建議檢視原因", 1], ["目標配置未完全對齊", "配置與目標仍有差距", 1],
+  ["超額流動性核對", "現金／流動資產比例較高", 1], ["高收益集中度", "高收益債比重較高", 1], ["投資知識與經驗", "需確認產品適配性", 1], ["債券/證券到期核對", "相關產品接近到期", 1]];
+const health = () => `<details class="acc" open><summary>投資組合健康預警</summary>
+  ${HEALTH.map(([t, d, ok]) => `<div class="al"><span class="${ok ? "tick" : "cross"}">${ok ? "✓" : "✕"}</span><div><b>${t}</b><small>${d}</small></div></div>`).join("")}</details>`;
+
+const pager = (left, pages) => `<div class="pager"><span>${left}</span><div class="pg"><span class="muted">|‹ &nbsp; ‹</span><span class="cur">1</span>${pages.map(p => `<span>${p}</span>`).join("")}<span>› &nbsp; ›|</span><span>前往<span class="box"></span>頁</span></div></div>`;
+
+/* ====== Pages ====== */
+function pgOverview() {
+  const leads = [["star", "每日前線AI模型", "IS001", "2025/05/02"], ["horn", "2025 Q1 潛質客戶 Call Lead", "DM240005", "2025/05/02"],
+    ["star", "2025 Q4 客戶關係管理策略", "IS001", "2025/05/12 -<br>2025/06/31"], ["horn", "2025 Q3 主要客戶會議安排", "DM240005", "2025/05/21"]];
+  const news = [["投資組合健康預警", "2025/05/21"], ["定期單到期", "2025/05/21"], ["QIP 將於兩星期後到期", "2025/04/10"], ["保單狀態變動", "2025/04/10"]];
+  return `<div class="layout three">${profile()}
+  <div class="stack">
+    <div class="card row" style="gap:0">
+      <div style="flex:1"><div class="label">上月綜合理財總值 (港元等值)(TRB) ${I("info")}</div><div class="num">${hkd("9,500,000.00")}</div></div>
+      <div style="flex:1;border-left:1px solid var(--line);padding-left:16px"><div class="label">往來及儲蓄賬戶餘額 (港元等值)(CASA)</div><div class="num">${hkd("2,700,000.00")}</div></div>
+    </div>
+    <div class="card">
+      <div class="row between"><div><div class="label">資產總值 (港元等值) ${I("info")}</div><div class="num">${hkd("4,500,000.00")}</div></div>
+        <button class="btn" data-toast="資產組合報表">${I("download")}資產組合報表</button></div>
+      <h3 style="margin-top:22px">持有資產分佈</h3>
+      ${dist([["存款", "2,700,000.00", 60, "#3aab9a"], ["投資", "1,350,000.00", 30, "#ffab2e"], ["壽險", "450,000.00", 10, "#7fc922"]], "資產", "價值")}
+    </div>
+    <div class="card flush">
+      <div class="subtabs"><div class="on">跟進項目 <span class="count">6</span></div><div>過往項目</div></div>
+      <div style="padding:18px 20px 22px">
+        <h3>銷售線索</h3><div class="muted" style="margin-top:2px">未聯絡、再致電的Must Do和銷售線索</div>
+        <div class="list">${leads.map(([ic, t, c, d]) => `<div class="li">${I(ic)}<div><b>${t}</b><br><small>${c}</small></div><div>${d}</div><span class="tag">未聯絡</span></div>`).join("")}</div>
+        <h3 style="margin-top:24px">商機</h3><div class="muted" style="margin-top:2px">轉介入、已聯絡和已預約的商機</div>
+        <div class="list"><div class="li" style="grid-template-columns:40px 90px 1fr 20px">${I("inbox")}<span>轉介入</span><span><b>投資</b> <span class="muted">｜</span> 基金</span><span>›</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="stack">
+    <details class="acc" open><summary>客戶動態</summary>${news.map(([t, d]) => `<div class="it"><b>${t}</b><span class="muted">提示日期: ${d}</span></div>`).join("")}</details>
+    ${health()}
+    <details class="acc"><summary>附註<button class="btn" data-toast="新增附註">+ 新增附註</button></summary><div class="body">（附註內容）</div></details>
+    <details class="acc"><summary>手機銀行足跡 <span class="muted">${I("info")}</span></summary><div class="body">（手機銀行足跡內容）</div></details>
+    <details class="acc"><summary>自設外匯到價提示</summary><div class="body">（自設外匯到價提示內容）</div></details>
+    <details class="acc"><summary>參考名單</summary><div class="body">（參考名單內容）</div></details>
+  </div></div>`;
+}
+
+function pgInvOverview() {
+  const items = [["基金", "258,677.70", 48.5, "#3aab9a"], ["債券/存款證", "106,840.00", 20, "#ffab2e"], ["外匯掛鈎投資-雙貨幣投資/期權投資", "64,240.00", 12, "#7fc922"],
+    ["證券 (只計算香港市場)", "32,980.00", 6.2, "#e07b8a"], ["股票掛鈎投資/結構性票據", "29,400.00", 5.5, "#f9795a"], ["貴金屬存摺賬戶", "16,297.30", 3, "#55c5d3"],
+    ["結構性投資", "13,148.00", 2.5, "#e6c229"], ["貴金屬及外匯孖展", "12,217.00", 2.3, "#dddddd"]];
+  return `<div class="layout">${profile()}
+  <div class="card" style="border:1px solid #e6e6e6">
+    <div class="row" style="gap:0;align-items:flex-start;padding-bottom:14px;border-bottom:1px solid var(--line)">
+      <div style="flex:1"><div class="label">綜合投資業務價值</div><div class="num">${hkd("533,800.00")}</div></div>
+      <div style="flex:1;border-left:1px solid var(--line);padding-left:16px"><div class="label">投資風險取向</div><div class="num">4 <span class="unit">中度進取</span></div></div>
+      <div style="flex:1;border-left:1px solid var(--line);padding-left:16px">${kv([["投資者- 交易經驗", OK], ["投資者- 培訓", '<span class="okdot no">✕</span>'], ["投資者- 工作經驗", OK]])}</div>
+    </div>
+    <h3 style="margin-top:18px">持有投資產品分佈</h3>
+    ${dist(items, "投資產品", "餘額/賬面餘額 (港元等值)")}
+  </div></div>`;
+}
+
+function pgFund() {
+  const funds = [["聯博 - 美國增長基金 (A 美元)", "68,821.23", "67,909.23", "+731.18", 1, "13"], ["貝萊德亞太股票入息基金", "35,500.44", "33,000.88", "+1,816.44", 1, "10"], ["聯博 - 美國增長基金 (B 美元)", "50,034.33", "48,034.33", "-1,002.00", 0, "1"]];
+  return `<div class="layout">${profile()}
+  <div class="stack">
+    <div class="card" style="border:1px solid #e6e6e6"><div class="label">總餘額/賬面餘額 (港元等值)</div><div class="num">${hkd("258,677.70")}</div></div>
+    <div class="row between" style="padding:10px 0 8px 8px;border-bottom:1px solid #d5d5d5"><h3 class="muted" style="color:var(--ink-2)">基金賬戶 <span class="tag" style="font-size:10px;padding:0 6px">6</span></h3><span class="row"><span class="toggle"></span>轉成港元等值</span></div>
+    <details class="acct" open>
+      <summary><div><h4 style="font-weight:500">投資賬戶</h4><span class="muted">012-348-1-4863726428-3 ${I("copy")}</span></div><div><small>餘額/賬面餘額 (港元等值)</small><div class="num" style="font-size:16px">${hkd("154,356.00")}</div></div></summary>
+      <div class="inner">
+        <div class="row between"><h3>賬戶資料</h3><span class="row"><button class="btn" data-toast="交易記錄">${I("clock")}交易記錄</button><button class="btn" data-toast="下載基金報表">${I("download")}下載基金報表</button></span></div>
+        <div style="padding:14px 16px 26px"><small class="muted">賬戶持有人</small><br>吳浩康，謝君豪</div>
+        <h3>持倉產品 <span class="count">3</span></h3>
+        <table style="margin-top:14px"><thead><tr><th>基金名稱/代號</th><th class="r">參考市值</th><th class="r">成本</th><th class="r">參考盈虧 (未變現)</th><th class="r">累計現金派息</th><th></th></tr></thead><tbody>
+        ${funds.map(([n, mv, c, pl, up, div]) => `<tr><td><span style="font-size:15px">${n}</span><br><small>LU0079474960</small></td><td class="r">${hkd(mv, "USD")}</td><td class="r">${hkd(c, "USD")}</td><td class="r ${up ? "up" : "down"}">${pl} <span class="unit">USD</span></td><td class="r">${hkd(div, "USD")}</td><td class="muted">›</td></tr>`).join("")}
+        </tbody></table>
+      </div>
+    </details>
+    <details class="acct">
+      <summary><div><h4 style="font-weight:500">投資賬戶 <span class="tag" style="font-size:10px">聯名戶</span></h4><span class="muted">012-348-1-4863726428-3 ${I("copy")} ｜ 吳浩康，謝君豪</span></div><div><small>餘額/賬面餘額 (港元等值)</small><div class="num" style="font-size:16px">${hkd("104,321.70")}</div></div></summary>
+      <div class="inner muted">（聯名戶持倉內容）</div>
+    </details>
+  </div></div>`;
+}
+
+function pgContact() {
+  const rows = [["chat", "騰訊會議", 1], ["walk", "出訪", 0], ["chat", "在線對話", 1], ["phone", "電話 (呼出)", 1]];
+  return `<div class="layout">${profile()}
+  <div><h2 style="margin:4px 0 20px">電話/面談記錄</h2>
+    <div class="card flush"><table><thead><tr><th>日期/時間 ⇅</th><th>聯絡渠道</th><th>跟進人員</th><th class="r">狀態</th><th></th></tr></thead><tbody>
+    ${rows.map(([ic, ch, ok]) => `<tr><td>2026/08/20 &nbsp;&nbsp; 15:13</td><td><span class="muted">${I(ic)}</span> ${ch}</td><td><b>Customer Name</b><br><small>#CIN</small></td><td class="r"><span class="tag ${ok ? "ok" : "bad"}" style="font-size:10px">${ok ? "成功聯絡" : "未能聯絡"}</span></td><td>›</td></tr>`).join("")}
+    </tbody></table>${pager("1-13 共 300 個客戶", [2, 3, 4, 5])}</div>
+  </div></div>`;
+}
+
+function pgLifeSales() {
+  const off = '<span class="tag off" style="font-size:10px">不適用</span>';
+  return `<div class="layout">${profile()}
+  <div>
+    <div class="row between"><h2>36個流程</h2><span class="row"><button class="btn" data-toast="VC表徵上訴維護">VC表徵上訴維護</button><button class="btn primary" data-toast="壽險銷售前需知">壽險銷售前需知</button></span></div>
+    <div class="muted" style="color:var(--ink-2);margin:6px 0 12px">僅限於透過本行系統完成的銷售流程或更改，方會列示於下方清單內。</div>
+    <div class="row between" style="margin-bottom:14px"><span class="row" style="gap:6px"><span class="filter">YYYY/MM/DD ${I("calendar")}</span><span class="filter">銷售狀態 <span>⌄</span></span></span><button class="btn">更多篩選 <span class="tag" style="font-size:9px;padding:0 5px">3</span></button></div>
+    <div class="card flush"><table><thead><tr><th>最後更新日期 ⇅</th><th>流程編號</th><th>銷售狀態</th><th>繳付狀態 ${I("info")}</th><th>銷售紀錄表</th><th>審批狀態</th><th></th></tr></thead><tbody>
+      <tr><td>今天</td><td>B20005018827453009</td><td><span class="tag" style="font-size:11px">未完成評估負擔能力</span></td><td>${off}</td><td>${off}</td><td>${off}</td><td class="r"><button class="btn" data-toast="活動日誌">${I("clock")}活動日誌</button> <button class="btn" data-toast="續流">↻ 續流</button></td></tr>
+      <tr><td>今天</td><td>B20005018827453009</td><td><span class="tag teal" style="font-size:11px">完成銷售流程</span></td><td><span class="tag ok" style="font-size:11px">扣繳保費成功</span></td><td><span class="tag warn" style="font-size:11px">待填寫</span></td><td>${off}</td><td class="r"><button class="btn" data-toast="活動日誌">${I("clock")}活動日誌</button> <button class="btn" data-toast="瀏覽流程">瀏覽流程</button></td></tr>
+    </tbody></table>${pager("36 個流程", [2, 3])}</div>
+  </div></div>`;
+}
+
+function pgPortfolio() {
+  const mov = [1, 1, 0, 0, 1];
+  const left = `<aside class="profile">
+    <section>${WHO}</section>
+    <section><div class="row between"><span class="muted">基準 ${I("info")}</span><button style="color:var(--teal);font-size:11px">⤮ 切換基準</button></div><b style="font-size:15px;font-weight:500">基準風險等級 4</b></section>
+    <section><h4>客戶投資簡介</h4>${kv([["總投資資產 " + I("info"), hkd("1,350,000.00")], ["總盈虧額 (未變現)", hkd("2,545.70") + ' <span class="unit">(+24.2%)</span>'], ["客戶層", "私人財富"], ...RISK, ["衍生工具知識", OK + " 有"]])}</section>
+    <section><h4>投資銷售重點標籤</h4>${kv([["VC 表徵", "N/A"], ["原有客戶狀態", OK + " 是"], ["同意使用存款資訊 (C-44)", OK + " 同意"], ["同意介紹理財通資訊", OK + " 同意"], ["MPI 狀態", OK + " 是"], ["CRS 狀態", "N/A"], ["W-8BEN 表格有效至", "2027/01/01"]])}</section>
+  </aside>`;
+  return `<div class="layout three">${left}
+  <div>
+    <div class="row between"><h2>重點分析</h2><span class="row"><button class="btn" data-toast="準備投資簡報">${I("chart")}準備投資簡報</button><button class="btn primary" data-toast="生成建議提案">${I("edit")}生成建議提案</button></span></div>
+    <div class="muted" style="color:var(--ink-2);margin:8px 0 18px">快速掌握整體投資組合的整體表現、風險及重點狀況</div>
+    <div class="grid2">
+      <div class="card mini"><div class="hd">${I("clock")}投資組合</div><div class="row" style="gap:16px">
+        <div><small>股票</small><br><b style="font-weight:500">51.9%</b></div><div><small>固定收益</small><br><b style="font-weight:500">27.4%</b></div><div><small>流動資金</small><br><b style="font-weight:500">13.3%</b></div>
+        <div class="stackbar"><i style="flex:1;background:#f9795a"></i><i style="flex:2;background:#8a7fd6"></i><i style="flex:5;background:#2fb3c4"></i><i style="flex:6;background:#63e69b"></i></div></div></div>
+      <div class="card mini"><div class="hd">${I("chart")}情境壓力測試</div><div class="row"><div><span class="down" style="font-size:16px">▾ 24.6%</span> <b style="font-size:16px;font-weight:500">潛在虧損</b><br><small>當港股下跌 10% 時</small></div>
+        <div class="row" style="margin-left:auto;align-items:flex-start;gap:16px"><i style="width:14px;height:18px;background:#b3002d;border-radius:2px"></i><i style="width:14px;height:54px;background:#555;border-radius:2px"></i></div></div></div>
+      <div class="card mini"><div class="hd">${I("info")}風險分析</div><div class="row between"><div><b style="font-size:16px;font-weight:500">15 - 偏進取</b><br><small>高於基準 4.4</small></div>
+        <svg width="70" height="12" viewBox="0 0 70 12"><path d="M0 6h14M17 6h14M34 6h14M56 6h14" stroke="#ddd" stroke-width="5"/><path d="M19 1v10" stroke="#555" stroke-width="2"/><path d="M50 1v10" stroke="#b3002d" stroke-width="2"/></svg></div></div>
+      <div class="card mini"><div class="hd">${I("chart")}投資回報</div><div class="row between"><div><span style="font-size:16px;color:var(--teal-2)">▴ 21.1%</span><br><small>在過去 3 個月</small></div>
+        <svg width="70" height="34" viewBox="0 0 70 34" fill="none" stroke="#999"><path d="M2 32l6-12 4 6 6-16 5 12 5-8 5 9 6-12 5 8 6-6 5 3 6-6"/><circle cx="64" cy="11" r="1.500" fill="#b3002d" stroke="none"/></svg></div></div>
+      <div class="card flush lst"><div class="hd">Top 5 最大波動性的產品</div>${mov.map(u => `<div class="ln"><span>貝萊德亞太股票入息基金</span><span class="${u ? "up" : "down"}" style="font-size:9px">${u ? "▴" : "▾"} <span class="muted">24.10%</span></span></div>`).join("")}</div>
+      <div class="card flush lst"><div class="hd">即將到期產品<span style="margin-left:auto;font-size:11px;font-weight:400">查看全部 &nbsp;›</span></div>${mov.map(() => `<div class="ln"><span>貝萊德亞太股票入息基金</span><span>2026/12/16</span></div>`).join("")}</div>
+    </div>
+    <div class="muted" style="text-align:center;margin-top:36px;font-size:11px">數據更新: 2026/09/28 13:12</div>
+  </div>
+  <div class="stack">${health()}
+    <details class="acc" open><summary>投資組合特徵</summary><div class="body" style="border-top:3px solid var(--bg);padding-top:10px">
+      <table style="font-size:10px"><thead><tr><th style="border:0;padding:4px"></th><th class="r" style="border:0;padding:4px;font-weight:400">現時</th><th class="r" style="border:0;padding:4px;font-weight:400">基準</th></tr></thead><tbody>
+      ${[["平均存續期 (年)", "0.44", "1.22"], ["平均淨費用比率 (%)", "0.27", "0.00"], ["過去12個月平均收益率 (%)", "2.60", "0.84"]].map(r => `<tr style="background:none"><td style="padding:4px 0">${r[0]}</td><td class="r" style="padding:4px;color:var(--ink)">${r[1]}</td><td class="r" style="padding:4px;color:var(--ink)">${r[2]}</td></tr>`).join("")}
+      </tbody></table></div></details>
+  </div></div>`;
+}
+
+/* Designed screens, keyed by "tabIndex|Level2|Level3". Anything else falls back to a placeholder. */
+const PAGES = {
+  "0": pgOverview,
+  "1|投資|投資概覽": pgInvOverview,
+  "1|投資|基金": pgFund,
+  "3|聯絡記錄|電話/面談": pgContact,
+  "4|銷售流程|壽險銷售": pgLifeSales,
+  "4|投資組合分析及建議|投資組合概覽": pgPortfolio
+};
+
+/* ====== Navigation ====== */
+const $ = id => document.getElementById(id);
+const tabsEl = $("tabs"), megaEl = $("mega"), navEl = $("nav");
+let current = { tab: 0, l2: null, l3: null };       // default landing: 客戶概覽
+let openTab = null, closeTimer = null;
+
+function findGroup(tab, l2) {
+  for (const col of MENU[tab].cols || []) for (const g of col) if (g.label === l2) return g;
+  return null;
+}
+function tabLabel(i) {
+  const t = MENU[i];
+  if (i !== current.tab || !current.l2) return t.label;   // every Level 2 section shows as「Tab：Level 2」
+  const g = findGroup(i, current.l2);
+  return `${t.label}：${g.short || g.label}`;
+}
+function renderTabs() {
+  tabsEl.innerHTML = MENU.map((t, i) => `
+    <button class="tab ${i === current.tab ? "active" : ""}" data-tab="${i}" ${t.cols ? 'aria-haspopup="true" aria-expanded="false"' : ""}>${tabLabel(i)}${t.cols ? CHEV : ""}</button>`).join("") +
+    `<div class="right">${current.tab === 0 ? '<button class="btn primary" style="padding:7px 14px" data-toast="建立活動記錄">＋ 建立活動記錄</button>' : ""}
+     <button title="重新整理" aria-label="重新整理"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13.500 8a5.500 5.500 0 0 1-9.500 3.800M2.500 8A5.500 5.500 0 0 1 12 4.200M12.500 1.500v3h-3M3.500 14.500v-3h3"/></svg></button></div>`;
+}
+function renderMega(i) {
+  const t = MENU[i];
+  const isCur = (l2, l3) => current.tab === i && current.l2 === l2 && current.l3 === (l3 || null);
+  megaEl.style.gridTemplateColumns = `repeat(${t.cols.length}, 240px) 232px`;   // column widths per PDF: menu 240px, 快速連結 232px
+  megaEl.innerHTML = `
+    <div class="cols" style="grid-template-columns:repeat(${t.cols.length},1fr)">
+      ${t.cols.map(col => `<div>${col.map(g => `<div class="group">
+          ${g.children
+            ? `<span class="l2">${g.label}</span>` + g.children.map(c => `<button class="l3 ${isCur(g.label, c) ? "current" : ""}" data-l2="${g.label}" data-l3="${c}">${c}</button>`).join("")
+            : `<button class="l2 ${isCur(g.label) ? "current" : ""}" data-l2="${g.label}">${g.label}</button>`}
+        </div>`).join("")}</div>`).join("")}
+    </div>
+    <div class="quick"><h6>快速連結</h6>${t.quick.map(q => `<button class="ql" data-toast="${q.label}">${I(q.icon)}${q.label}</button>`).join("")}</div>`;
+}
+function setOpen(i) {
+  tabsEl.querySelectorAll(".tab").forEach((b, n) => {
+    b.classList.toggle("open", n === i);
+    if (b.hasAttribute("aria-expanded")) b.setAttribute("aria-expanded", n === i);
+  });
+}
+function open(i) {
+  clearTimeout(closeTimer);
+  if (!MENU[i].cols) return close();
+  if (openTab === i) return;
+  openTab = i; renderMega(i); megaEl.classList.add("show"); setOpen(i); placeMega(i);
+}
+/* Align the dropdown to the left edge of its tab; shift left only if it would overflow the tab bar's right edge */
+function placeMega(i) {
+  const tab = tabsEl.querySelectorAll(".tab")[i];
+  const maxLeft = navEl.clientWidth - 20 - megaEl.offsetWidth;
+  megaEl.style.left = Math.max(20, Math.min(tab.offsetLeft, maxLeft)) + "px";
+}
+window.addEventListener("resize", () => { if (openTab !== null) placeMega(openTab); });
+function close() { clearTimeout(closeTimer); openTab = null; megaEl.classList.remove("show"); setOpen(-1); }
+const scheduleClose = () => { clearTimeout(closeTimer); closeTimer = setTimeout(close, 180); };
+
+function renderPage() {
+  const g = current.l3 ? findGroup(current.tab, current.l2) : null;
+  $("pills").innerHTML = g ? g.children.map(c => `<button class="pill ${c === current.l3 ? "current" : ""}" data-l3="${c}">${c}</button>`).join("") : "";
+  const key = [current.tab, current.l2, current.l3].filter(x => x !== null).join("|");
+  const name = current.l3 || current.l2 || MENU[current.tab].label;
+  $("content").innerHTML = PAGES[key] ? PAGES[key]()
+    : `<div class="layout">${profile()}<div class="placeholder">「${name}」頁面內容（Placeholder）</div></div>`;
+  window.scrollTo(0, 0);
+}
+function go(tab, l2, l3) { current = { tab, l2: l2 || null, l3: l3 || null }; close(); renderTabs(); renderPage(); }
+function toast(msg) {
+  const el = $("toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 1600);
+}
+
+/* ---- Events ---- */
+const tabOf = e => e.target.closest(".tab");
+tabsEl.addEventListener("mouseover", e => { const b = tabOf(e); if (b) open(+b.dataset.tab); });
+tabsEl.addEventListener("focusin", e => { const b = tabOf(e); if (b) open(+b.dataset.tab); });
+tabsEl.addEventListener("click", e => {
+  const b = tabOf(e); if (!b) return;
+  const i = +b.dataset.tab;
+  if (!MENU[i].cols) go(i); else open(i);     // tab without dropdown navigates directly
+});
+navEl.addEventListener("mouseleave", scheduleClose);
+navEl.addEventListener("mouseenter", () => clearTimeout(closeTimer));
+navEl.addEventListener("focusout", e => { if (!navEl.contains(e.relatedTarget)) scheduleClose(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+megaEl.addEventListener("click", e => { const b = e.target.closest("[data-l2]"); if (b) go(openTab, b.dataset.l2, b.dataset.l3); });
+$("pills").addEventListener("click", e => { const p = e.target.closest(".pill"); if (p) go(current.tab, current.l2, p.dataset.l3); });
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-toast]"); if (!t) return;
+  e.preventDefault(); toast(t.dataset.toast); close();
+});
+
+renderTabs(); renderPage();
+</script>
+</body>
+</html>
