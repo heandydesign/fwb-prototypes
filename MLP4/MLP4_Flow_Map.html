@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<script>try{window.__lay=localStorage.getItem("mlp4-layout")||"v"}catch(e){window.__lay="v"}</script>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("mlp4-theme")||"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MLP4 投資銷售流程 As-Is</title>
+<style>
+:root{
+  --bg:#f6f5f1;--panel:#ffffff;--ink:#1f1f1c;--mute:#6b6a64;--line:#cfcdc4;--soft:#ebe9e1;
+  --trunk:#0f6e56;--trunk-bg:#e1f5ee;
+  --gate:#9a5b00;--gate-bg:#fdf0d5;
+  --scen:#185fa5;--scen-bg:#e6f1fb;
+  --exc:#a32d2d;--exc-bg:#fcebeb;
+  --prod:#534ab7;--prod-bg:#eeedfe;
+  --s1:#e1f5ee;--s2:#e6f1fb;--s3:#eeedfe;--s4:#faece7;
+  --shadow:0 1px 2px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]):not([data-theme="dark"]){--bg:#161614;--panel:#21211e;--ink:#ecebe5;--mute:#a09f97;--line:#45443e;--soft:#2b2a26;
+    --trunk:#5dcaa5;--trunk-bg:#0f3a2f;
+    --gate:#f0b54a;--gate-bg:#3d2c0a;
+    --scen:#85b7eb;--scen-bg:#10304f;
+    --exc:#f09595;--exc-bg:#4a1b1b;
+    --prod:#afa9ec;--prod-bg:#2a2660;
+    --s1:#0f3a2f;--s2:#10304f;--s3:#2a2660;--s4:#4a2a1c;}
+}
+:root[data-theme="dark"]{--bg:#161614;--panel:#21211e;--ink:#ecebe5;--mute:#a09f97;--line:#45443e;--soft:#2b2a26;
+    --trunk:#5dcaa5;--trunk-bg:#0f3a2f;
+    --gate:#f0b54a;--gate-bg:#3d2c0a;
+    --scen:#85b7eb;--scen-bg:#10304f;
+    --exc:#f09595;--exc-bg:#4a1b1b;
+    --prod:#afa9ec;--prod-bg:#2a2660;
+    --s1:#0f3a2f;--s2:#10304f;--s3:#2a2660;--s4:#4a2a1c;}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;flex-direction:column}
+header{padding:12px 20px 10px;border-bottom:1px solid var(--line);background:var(--panel);position:relative;z-index:10}
+h1{font-size:20px;margin:0;font-weight:600}
+.sub{color:var(--mute);font-size:15px}
+.title-row,.bar,.header-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.title-row{justify-content:space-between}
+.bar{margin-top:8px}
+.control-label{display:flex;align-items:center;gap:6px;font-size:15px}
+.control-label select{max-width:100%}
+.bar #q{flex:1 1 175px;max-width:300px;min-width:0}
+.header-menu{position:relative}
+.header-menu summary{display:flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:15px;padding:5px 8px;border:1px solid var(--line);border-radius:6px}
+.header-menu summary::-webkit-details-marker{display:none}
+.header-menu summary::after{content:"";width:6px;height:6px;border-right:1px solid;border-bottom:1px solid;transform:translateY(-2px) rotate(45deg)}
+.header-menu[open] summary,.header-menu summary:hover{background:var(--soft)}
+.menu-panel{position:absolute;top:calc(100% + 6px);right:0;min-width:176px;max-width:calc(100vw - 28px);width:max-content;padding:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.14);display:grid;gap:2px}
+.menu-panel button.btn{border-color:transparent;text-align:left}
+.menu-panel .chk{display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;padding:5px 8px;border-radius:5px}
+.menu-panel .chk:hover{background:var(--soft)}
+.chk input{accent-color:currentColor;margin:0}
+#help,#sources{background:var(--panel);border:1px solid var(--line);border-radius:8px;max-width:460px;color:var(--mute);font-size:14px}
+#help p,#sources p{margin:4px 5px}
+@media(max-width:600px){
+  header{padding-inline:12px}
+  .bar #q{max-width:none}
+  .bar .header-menu{margin-left:auto}
+  .control-label{min-width:0}
+  .control-label select{min-width:0;max-width:calc(100vw - 68px)}
+  .header-actions .header-menu:first-child .menu-panel{left:0;right:auto}
+  #help,#sources{width:min(360px,calc(100vw - 28px))}
+}
+.t-gate{color:var(--gate)}.t-scenario{color:var(--scen)}.t-exception{color:var(--exc)}.t-product{color:var(--prod)}
+select,input[type=search],button.btn{font:inherit;font-size:15px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+button.btn{cursor:pointer}
+button.btn:hover{background:var(--soft)}
+input[type=search]{width:190px}
+#scroller{flex:1;overflow:auto;padding:14px 20px 28px;position:relative}
+#canvas{display:flex;align-items:flex-start;gap:0;width:max-content;min-height:100%}
+.stage{display:flex;flex-direction:column;border-radius:12px;padding:8px 10px 14px;margin-right:28px;position:relative}
+.stage:not(:last-child):after{content:"";position:absolute;right:-28px;top:86px;width:28px;height:2px;background:var(--trunk)}
+.stage:not(:last-child):before{content:"";position:absolute;right:-29px;top:82px;border:5px solid transparent;border-left:7px solid var(--trunk);border-right:0}
+.stage h2{font-size:16px;margin:0 0 2px;font-weight:600}
+.stage .zh{font-size:14px;color:var(--mute);margin-bottom:8px}
+.stage[data-s="1"]{background:var(--s1)}.stage[data-s="2"]{background:var(--s2)}
+.stage[data-s="3"]{background:var(--s3)}.stage[data-s="4"]{background:var(--s4)}
+.row{display:flex;align-items:flex-start}
+.col{width:296px;display:flex;flex-direction:column;align-items:stretch;position:relative}
+.arrow{width:26px;flex:none;align-self:flex-start;margin-top:36px;height:2px;background:var(--trunk);position:relative}
+.arrow:after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid var(--trunk);border-right:0}
+.node{background:var(--panel);border:2px solid var(--trunk);border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:var(--shadow);min-height:84px;text-align:left;color:inherit;font:inherit;width:100%}
+.node{display:flex;align-items:flex-start;gap:11px}
+.node .nb{flex:1;min-width:0}
+.node .ic{flex:none;width:42px;height:42px;border-radius:11px;background:var(--trunk-bg);color:var(--trunk);display:flex;align-items:center;justify-content:center;margin-top:2px}
+.node .ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.node .ic.txt{font:800 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.2px}
+.node[data-ms] .ic{background:var(--panel)}
+.stage[data-s="4"] .node .ic{background:var(--panel)}
+.node:hover{background:var(--trunk-bg)}
+.node.sel{background:var(--trunk-bg);outline:3px solid var(--trunk);outline-offset:1px}
+.node .n{font-size:14px;color:var(--trunk);font-weight:600}
+.node .ti{font-size:16.5px;font-weight:600;line-height:1.3}
+.node .ds{font-size:14.5px;color:var(--mute);margin-top:2px}
+.node .meta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.pill{font-size:13.5px;padding:0 6px;border-radius:99px;background:var(--soft);color:var(--mute)}
+.pill.cnt{background:var(--trunk-bg);color:var(--trunk);font-weight:600}
+.lane{margin:8px 0 0 14px;padding-left:10px;border-left:2px dashed var(--line);display:none;flex-direction:column;gap:6px}
+.col.open .lane{display:flex}
+.chip{display:block;text-align:left;font:inherit;font-size:15px;line-height:1.35;border-radius:8px;padding:5px 8px;border:1px solid;cursor:pointer;background:var(--panel);width:100%;position:relative}
+.chip:before{content:"";position:absolute;left:-12px;top:50%;width:10px;border-top:2px dashed var(--line)}
+.chip.gate{border-color:var(--gate);color:var(--gate);background:var(--gate-bg)}
+.chip.scenario{border-color:var(--scen);color:var(--scen);background:var(--scen-bg)}
+.chip.exception{border-color:var(--exc);color:var(--exc);background:var(--exc-bg)}
+.chip.product{border-color:var(--prod);color:var(--prod);background:var(--prod-bg)}
+.chip.sel{outline:3px solid currentColor;outline-offset:1px}
+.chip.dim{opacity:.22}
+.chip.hide{display:none}
+.chip .tg{font-size:13px;opacity:.85;margin-left:4px}
+#tip{position:fixed;left:0;top:0;width:min(580px,92vw);max-height:74vh;overflow:hidden;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-top:3px solid var(--trunk);border-radius:10px;padding:10px 14px 12px;box-shadow:0 10px 30px rgba(0,0,0,.22);z-index:30;display:none;pointer-events:none}
+#tip.show{display:block}
+#tip.pin{pointer-events:auto;overflow:auto;border-top-color:var(--scen)}
+#tip h3{margin:0 24px 2px 0;font-size:17.5px;line-height:1.35}
+button.btn.close{position:absolute;top:8px;right:8px;width:32px;height:32px;padding:0;display:grid;place-items:center;font-size:19px;line-height:1}
+#help h2,#sources h2{margin:0 36px 8px 0}
+#gloss .gh,#pain .gh,#mx .mh{position:relative}
+#gloss .gh h3,#pain .gh h3{padding-right:34px;min-height:29px}
+#mx .mh{padding-right:48px;min-height:48px}
+#tip.pin .drag{padding-right:34px}
+#tip .drag{margin:-10px -14px 8px;padding:5px 40px 5px 14px;font-size:12px;color:var(--mute);background:var(--soft);cursor:grab;border-radius:8px 8px 0 0;user-select:none;touch-action:none}
+#tip.dragging .drag{cursor:grabbing}#tip.dragging{box-shadow:0 14px 38px rgba(0,0,0,.32)}
+#tip.pin h3{cursor:grab}
+body.nosel,body.nosel *{user-select:none!important;cursor:grabbing!important}
+#tip .grid{grid-template-columns:1fr;gap:6px;margin-top:6px}
+#tip .hint{font-size:13.5px;color:var(--mute);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 22px;margin-top:8px}
+.grid h4{margin:0 0 2px;font-size:14.5px;color:var(--mute);font-weight:600;text-transform:none}
+.grid p,.grid ul{margin:0;font-size:16px}
+.grid ul{padding-left:18px}
+.badge{display:inline-block;font-size:14px;padding:1px 8px;border-radius:99px;margin-right:6px;border:1px solid var(--line)}
+.badge.src{color:var(--trunk);border-color:var(--trunk)}
+.badge.inf{color:var(--gate);border-color:var(--gate)}
+.badge.ver{color:var(--exc);border-color:var(--exc)}
+.tick{font-family:ui-monospace,Menlo,monospace;font-size:14.5px;background:var(--soft);padding:0 5px;border-radius:4px;margin-right:4px}
+
+#gloss{position:fixed;top:0;right:0;bottom:0;width:min(520px,92vw);background:var(--panel);border-left:2px solid var(--trunk);box-shadow:-6px 0 18px rgba(0,0,0,.15);transform:translateX(105%);transition:transform .25s ease;z-index:20;display:flex;flex-direction:column}
+#gloss.show{transform:none}
+#gloss .gh{padding:12px 16px 8px;border-bottom:1px solid var(--line)}
+#gloss .gh h3{margin:0 0 6px;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+#gloss .gh input{width:100%}
+#gloss .gf{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+#gloss .gf button{font:inherit;font-size:14px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--mute);cursor:pointer}
+#gloss .gf button.on{color:var(--trunk);border-color:var(--trunk);background:var(--trunk-bg)}
+#gbody{flex:1;overflow:auto;padding:4px 16px 20px}
+#gbody h4{margin:14px 0 4px;font-size:15px;color:var(--mute);font-weight:600}
+.gi{padding:6px 0;border-bottom:1px solid var(--soft)}
+.gi b{font-size:16.5px}.gi .lf{color:var(--scen);font-size:15px;margin-left:6px}
+.gi .ex{font-size:15.5px;margin-top:1px}
+.gi .st{display:inline-block;font-size:13.5px;padding:0 7px;border-radius:99px;border:1px solid var(--line);color:var(--mute);margin-top:3px}
+.gi .st.ok{color:var(--trunk);border-color:var(--trunk)}.gi .st.q{color:var(--gate);border-color:var(--gate)}.gi .st.w{color:var(--exc);border-color:var(--exc)}
+kbd{font:14px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--soft)}
+
+#pain{position:fixed;top:0;right:0;bottom:0;width:min(660px,94vw);background:var(--panel);border-left:2px solid var(--exc);box-shadow:-6px 0 18px rgba(0,0,0,.15);transform:translateX(105%);transition:transform .25s ease;z-index:21;display:flex;flex-direction:column}
+#pain.show{transform:none}
+#pain .gh{padding:12px 16px 8px;border-bottom:1px solid var(--line)}
+#pain .gh h3{margin:0 0 4px;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+#pain .gh .note{font-size:14px;color:var(--mute);margin-bottom:6px}
+#pain .gh input{width:100%}
+#pain .gf{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+#pain .gf button{font:inherit;font-size:14px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--mute);cursor:pointer}
+#pain .gf button.on{color:var(--exc);border-color:var(--exc);background:var(--exc-bg)}
+#pbody{flex:1;overflow:auto;padding:4px 16px 24px}
+#pbody h4{margin:14px 0 4px;font-size:15px;color:var(--mute);font-weight:600}
+.pi{padding:8px 10px;margin:6px 0;border:1px solid var(--line);border-left:3px solid var(--exc);border-radius:8px;background:var(--panel)}
+.pi .ph{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.pi .ref{font:600 14.5px ui-monospace,Menlo,monospace;color:var(--exc);background:var(--exc-bg);border-radius:4px;padding:0 6px}
+.pi .pt{font-weight:600;font-size:16.5px}
+.pi ul{margin:4px 0 0;padding-left:18px;font-size:15.5px}
+.pi .sg{margin-top:4px;font-size:15px;color:var(--scen)}
+.pi .vf{margin-top:4px;font-size:14.5px;color:var(--gate)}
+.pi .go{margin-top:5px;font-size:14px;font:inherit}
+.pi .go button{font:inherit;font-size:14px;padding:1px 8px;border-radius:99px;border:1px solid var(--trunk);color:var(--trunk);background:var(--trunk-bg);cursor:pointer}
+button.tick.pk{border:0;cursor:pointer;color:var(--exc);background:var(--exc-bg)}
+.pill.pn{background:var(--exc-bg);color:var(--exc);font-weight:600}
+
+body.v #canvas{flex-direction:column;width:auto;max-width:1100px;margin:0 auto;min-height:0}
+body.v .stage{margin-right:0;margin-bottom:36px;align-self:stretch}
+body.v .stage:not(:last-child):after{right:auto;left:38px;top:auto;bottom:-36px;width:2px;height:36px}
+body.v .stage:not(:last-child):before{right:auto;left:33px;top:auto;bottom:-37px;border:5px solid transparent;border-top:7px solid var(--trunk);border-bottom:0}
+body.v .row{flex-direction:column}
+body.v .col{width:auto;flex-direction:row;align-items:flex-start;gap:12px}
+body.v .node{width:370px;flex:none}
+body.v .arrow{width:2px;height:22px;margin:0 0 0 195px;align-self:flex-start}
+body.v .arrow:after{right:auto;left:-4px;top:auto;bottom:-1px;border:5px solid transparent;border-top:7px solid var(--trunk);border-bottom:0}
+body.v .lane{margin:0;padding-left:14px;flex:1;min-width:0;flex-direction:row;flex-wrap:wrap;gap:6px 8px;align-content:flex-start}
+body.v .chip{width:calc(50% - 4px)}
+body.v .chip:before{display:none}
+@media (max-width:640px){body.v .col{flex-direction:column}body.v .node{width:100%}body.v .lane{margin:8px 0 0 14px}body.v .chip{width:100%}body.v .arrow{margin-left:40px}}
+@media print{#pain{display:none}}
+@media print{#gloss{display:none}}
+
+:root{--mu-bg:#fbf1a6;--mu-bd:#c2a800;--mc-bg:#e2d3f6;--mc-bd:#8a5bd0;--mx-bg:#dddcd6;--mx-bd:#8f8e87}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="dark"]){--mu-bg:#4a4310;--mu-bd:#d9c43a;--mc-bg:#3b2a63;--mc-bd:#b48cf0;--mx-bg:#33332f;--mx-bd:#77766e}}
+:root[data-theme="dark"]{--mu-bg:#4a4310;--mu-bd:#d9c43a;--mc-bg:#3b2a63;--mc-bd:#b48cf0;--mx-bg:#33332f;--mx-bd:#77766e}
+.node[data-ms="m"]{background:var(--mu-bg);border-color:var(--mu-bd)}
+.node[data-ms="c"]{background:var(--mc-bg);border-color:var(--mc-bd);border-style:dashed}
+.node[data-ms="x"]{background:var(--mx-bg);border-color:var(--mx-bd);border-style:dotted;opacity:.42;filter:grayscale(1)}
+.node[data-ms="x"]:hover{opacity:.85}
+.node[data-ms="mix"]{border-style:dashed}
+.ms-mix{background:var(--soft);border-color:var(--line)}
+.lg-mix{background:var(--panel);border-color:var(--trunk);color:var(--trunk)}
+.lg.lg-m,.lg.lg-c,.lg.lg-x,.lg.lg-mix{border-width:1.5px;border-style:dashed}
+.lg-mix{font-weight:600}
+.node .mx{display:none}
+.node .mx.on{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;margin-top:4px;line-height:1.35}
+.lg{display:inline-block;font-size:12.5px;padding:0 9px;border-radius:99px;border:1px solid;margin-right:6px}
+.lg-m{background:var(--mu-bg);border-color:var(--mu-bd)}.lg-c{background:var(--mc-bg);border-color:var(--mc-bd)}.lg-x{background:var(--mx-bg);border-color:var(--mx-bd)}
+.mxsum{padding:6px 20px 0;font-size:13.5px;min-height:0}.mxsum:empty{display:none}
+.mxs{margin-top:6px;padding:6px 10px;border-radius:8px;border-left:4px solid;font-size:13.5px}
+.ms-m{background:var(--mu-bg);border-color:var(--mu-bd)}.ms-c{background:var(--mc-bg);border-color:var(--mc-bd)}.ms-x{background:var(--mx-bg);border-color:var(--mx-bd)}
+#mx{position:fixed;inset:0;background:var(--bg);z-index:40;display:none;flex-direction:column}
+#mx.show{display:flex}
+#mx .mh{padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#mxwrap{flex:1;overflow:auto}
+#mxt{border-collapse:separate;border-spacing:0;font-size:12.5px}
+#mxt th,#mxt td{border:1px solid var(--line);padding:5px 7px;min-width:140px;max-width:220px;vertical-align:top;text-align:left;line-height:1.35}
+#mxt thead th{position:sticky;top:0;z-index:3;background:var(--soft);font-size:12.5px}
+#mxt .c0{position:sticky;left:0;z-index:2;min-width:170px;max-width:170px;background:var(--panel)}
+#mxt .c1{position:sticky;left:170px;z-index:2;min-width:90px;max-width:90px;background:var(--panel)}
+#mxt thead .c0,#mxt thead .c1{z-index:4;background:var(--soft)}
+#mxt td{cursor:pointer;font-size:12px}#mxt td:hover{outline:2px solid var(--trunk);outline-offset:-2px}
+#mxt .cs-m{background:var(--mu-bg)}#mxt .cs-c{background:var(--mc-bg)}#mxt .cs-x{background:var(--mx-bg);color:var(--mute)}
+@media print{#mx{display:none!important}}
+@media print{#tip,.bar,.header-actions{display:none}#scroller{overflow:visible}.lane{display:flex!important}}
+</style>
+</head>
+<body class="v">
+<header>
+  <div class="title-row">
+    <h1>MLP4 投資銷售流程 As-Is</h1>
+    <div class="header-actions">
+      <details class="header-menu">
+        <summary>參考資料</summary>
+        <div class="menu-panel">
+          <button class="btn" id="mbtn" title="產品 × 渠道矩陣 (M)">產品矩陣</button>
+          <button class="btn" id="pbtn" title="Pain point 表 (P)">Pain points</button>
+          <button class="btn" id="gbtn" title="術語表 (G)">術語表</button>
+          <button class="btn" id="sourcesBtn">資料來源</button>
+        </div>
+      </details>
+      <details class="header-menu">
+        <summary>更多</summary>
+        <div class="menu-panel">
+          <button class="btn" id="openAll">展開全部分支</button>
+          <button class="btn" id="closeAll">收起全部分支</button>
+          <button class="btn" id="layout" title="切換直向 / 橫向">↕ 直向</button>
+          <button class="btn" id="theme" title="切換淺色 / 深色 / 跟系統">☀ 淺色</button>
+          <button class="btn" id="helpBtn">操作說明</button>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="bar" id="bar">
+    <label class="control-label">產品 <select id="prodSel"></select></label>
+    <label class="control-label">渠道 <select id="chSel"><option value="F2F">面對面</option><option value="Phone">電話</option></select></label>
+    <input type="search" id="q" aria-label="搜尋步驟或編號" placeholder="搜尋步驟或編號…">
+    <details class="header-menu">
+      <summary id="filterLabel">分支篩選</summary>
+      <div class="menu-panel" id="typeChips"></div>
+    </details>
+  </div>
+  <dialog id="help" aria-labelledby="helpTitle">
+    <h2 id="helpTitle">操作說明</h2>
+    <p>點步驟展開分支及固定詳情，亦可用滑鼠停喺步驟或分支上預覽。</p>
+    <p><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> 切換步驟 · <kbd>M</kbd> 產品矩陣 · <kbd>G</kbd> 術語表 · <kbd>P</kbd> Pain points · <kbd>Esc</kbd> 關閉</p>
+    <form method="dialog"><button class="btn close" aria-label="關閉操作說明" autofocus>×</button></form>
+  </dialog>
+  <dialog id="sources" aria-labelledby="sourcesTitle">
+    <h2 id="sourcesTitle">資料來源</h2>
+    <p id="sourceNotes"></p>
+    <p><span class="badge src">來源</span> 取自 as-is / pain point / slide<br><span class="badge inf">推論</span> 由助理推論<br><span class="badge ver">待核實</span> 待同事或原 slide 確認</p>
+    <p>流程摘要來源為產品表，顏色由助理判讀。「表外」步驟不適用。</p>
+    <form method="dialog"><button class="btn close" aria-label="關閉資料來源" autofocus>×</button></form>
+  </dialog>
+</header>
+<div id="mxsum" class="mxsum"></div>
+<div id="scroller"><div id="canvas"></div></div>
+<aside id="gloss" aria-label="術語表"><div class="gh"><h3>術語表 Glossary <button class="btn close" id="gx" aria-label="關閉術語表" title="關閉 (Esc)">×</button></h3><input type="search" id="gq" placeholder="搜尋縮寫 / 全寫 / 解釋"><div class="gf" id="gf"></div></div><div id="gbody"></div></aside>
+<aside id="pain" aria-label="Pain point 表"><div class="gh"><h3><span>Pain point 表 <span class="sub" id="pcnt"></span></span> <button class="btn close" id="px" aria-label="關閉Pain points" title="關閉 (Esc)">×</button></h3><div class="note">取自 Investment_Flow_PainPoint.pdf。「原文建議」= 文件記錄嘅方向,唔等於已決定方案;「相關步驟」係我對應落 flow map 嘅 mapping(推論)。</div><input type="search" id="pq" placeholder="搜尋 ticket # / 關鍵字(例:#586、QIP、ELN)"><div class="gf" id="pf"></div></div><div id="pbody"></div></aside>
+<div id="mx" role="dialog" aria-label="產品矩陣"><div class="mh"><b>產品 × 渠道 × 步驟 矩陣</b><span class="lg lg-m">Must 必做</span><span class="lg lg-c">Conditional 視條件</span><span class="lg lg-x">Skip 跳過</span><span class="sub">★ Complex product · ◆ Structured product(需衍生工具知識)· 「被切」= 原圖文字被截斷 · 點擊 cell → 套用到 flow map</span><button class="btn close" id="mxx" aria-label="關閉產品矩陣" title="關閉 (Esc)">×</button></div><div id="mxwrap"></div></div>
+<div id="tip" role="tooltip"></div>
+<script>
+const GLOSS=[
+{g:'角色 / 人員',r:[
+['RM','Relationship Manager','分行前線銷售人員,主力跟進客戶及執行銷售流程','文件明確'],
+['BM','Branch Manager','分行經理,負責審批(例如 VC 客申請)','文件明確'],
+['IPC','Investment Product Consultant','投資顧問,協助 RM 處理較複雜產品嘅銷售','文件明確'],
+['PWRM','Premier Wealth Relationship Manager','服務 Premier Wealth 客戶層級嘅 RM','推測'],
+['BSM','Branch Sales Manager','分行銷售主管','推測'],
+['MT','Management Trainee','管理培訓生','推測']]},
+{g:'系統 / 平台',r:[
+['FWB','Frontline Workbench','本 project 嘅前線員工工作平台','文件明確'],
+['SMP','Sales Management Platform','銷售流程主系統,貫穿 TAQ、認購輸入、風險集中度檢查','推測(全寫)'],
+['WTS','Wealth Trading System','出現喺直聯 / 售後階段嘅交易系統','推測(全寫)'],
+['PPM','Personal Portfolio Management','MLP6 所屬系統 / 模組,處理組合分析同建議書','推測'],
+['MBK','Mobile Banking','MLP6 alert / health check 相關系統','已確認'],
+['BND / CTS','Bond System / Cash Transfer System','企業債券交收(BND)、資金凍結釋放(CTS)相關系統','推測(全寫)'],
+['KMP','—','前線痛點中提及「KMP 連結」,應為知識 / 資料庫類系統,全寫未列明','待查證']]},
+{g:'流程 / 合規詞彙',r:[
+['QIP','Questionnaire on Investment Profile','客戶投資取向問卷,評估風險承受能力,結果影響之後可揀邊啲產品','中文確認 / 英文推測'],
+['TAQ','Transaction Assessment Questionnaire','交易評估問卷,Part I 做風險 / 年期,Part II 做產品配對','中文確認 / 英文推測'],
+['PICOP','Pre-Investment Cooling-Off Period','落單冷靜期保障;只有「風險集中度 <20%、首次認購、65 歲以上」嘅客戶先可以揀唔執行','文件明確'],
+['Con risk','Concentration Risk','風險集中度,評估客戶持倉 / 認購係咪過份集中喺某類產品','文件明確'],
+['VC','Vulnerable Customer','易受損客戶,適用特別銷售 / 見證程序','文件明確'],
+['FTF','Face-to-Face','面對面(相對於 Phone deal)','文件明確'],
+['CID','Customer Identification','客戶身份識別','文件明確'],
+['SFO / SFC','Securities and Futures Ordinance / Commission','證券及期貨條例 / 證監會,合規依據','文件明確'],
+['D-knowledge','Derivative Knowledge','衍生工具知識,複雜產品(如 ELN)銷售前需確認客戶具備','文件明確'],
+['KFS','Key Facts Statement','產品重點資料概要,銷售基金時需派發','文件明確'],
+['W-8BEN','W-8BEN','美國稅務表格(非美國人士身份聲明),買企業債券時需要','文件明確(表格名)'],
+['ptd / txn / c/m','product / transaction / customer','內部速記','文件明確'],
+['BRCM / CA','Business Risk & Compliance Management / Checking Assessment','內部風控合規部門及其抽查機制','推測']]},
+{g:'產品類別',r:[
+['UT','Unit Trust','基金','文件明確'],
+['CD','Certificate of Deposit','存款證','文件明確'],
+['ELI','Equity Linked Investment','股票掛鈎投資','文件明確'],
+['ELN','Equity Linked Note','股票掛鈎票據,屬複雜產品,需 D-knowledge 先可賣','文件明確'],
+['SI','Structured Investment','結構性投資','文件明確'],
+['CLI','Currency Linked Investment','雙貨幣 / 期權投資','推測(全寫)'],
+['MMF','Money Market Fund','貨幣市場基金,保本性質較高','文件明確'],
+['IPO','Initial Public Offering','新股認購','文件明確']]},
+{g:'客戶 / VC 屬性',r:[
+['EP','Elderly Person','年長人士(65–74 / 75+),部分產品有額外限制','文件明確'],
+['VI','Visually Impaired','視障人士','推測'],
+['PWID','Person With Intellectual Disability','智障人士','推測'],
+['LE','—','低學歷客戶(VC 類別之一);唔可買 ELI、ELN,SI / CLI 只限續期及重覆交易','slide 對應推出,全寫待確認'],
+['LM','—','財政資源有限客戶(VC 類別之一);不接受所有投資產品','slide 對應推出,全寫待確認'],
+['IP','—','文盲客戶(VC 類別之一);不接受所有投資產品','slide 對應推出,全寫待確認'],
+['DD','—','聾啞客戶(VC 類別之一);只限面對面、必須錄音及見證','slide 對應推出,全寫待確認'],
+['MPI','—','私人財富客層;ELN、企業債券只限呢個客層','全寫未確認']]},
+{g:'待查證',r:[
+['FFI','—','暫冇足夠上下文推斷','待查證'],['SPI','—','暫冇足夠上下文推斷','待查證'],['PBA','—','暫冇足夠上下文推斷','待查證'],['CPP','—','暫冇足夠上下文推斷','待查證'],
+['TTS','—','暫冇足夠上下文推斷','待查證'],['FMS','—','暫冇足夠上下文推斷','待查證'],['IA','—','暫冇足夠上下文推斷','待查證'],['IPM','—','暫冇足夠上下文推斷','待查證']]}
+];
+
+const PAIN_CATS=['QIP / TAQ','客戶資格 / 賬戶','產品資料 / 介紹','基金多產品 / 轉換','產品別流程','表格 / 錄音 / 設備','系統 / 批核'];
+// r=ref  c=category  n=相關步驟(Claude mapping,推論)  t=title  d=原文重點  s=原文提及嘅方向/建議  v=待驗證
+const PAIN=[
+{r:'#1894',c:'QIP / TAQ',n:'p0',t:'QIP Phase II 改善(Q2–Q9,舊版 2023 起)',
+ d:['Q1 健康狀況:定義不清;RM 唔可以問,只可觀察表徵(參考他行做法)','Q2 收入 >$12 萬或投資資產 >$36 萬;Q3–4 資產類答案同開戶(AOP)資料唔一致,例:超高資產客自報低收入,QIP 過唔到','Q5 與 Q6 重疊(Q6 會 override Q5),Q5 好籠統;Q7 年期應為範圍,問題「平均投資年期」同答案「最長 X 年」唔對應','Q8 字眼過長、冇提實際回報率;Q9 各產品經驗表係 BoC 獨有,唔應要客戶記 3 年內交易次數','大部分 QIP 經 CC 或 MBK 做,冇人會喺非銷售 / 分行做;QIP 一律要錄音(所有銀行適用);Chi / Eng 意思對唔上'],
+ s:'財務問題應保持隨意,資產類可較模糊(TAQ / KYC 再深入);完成 QIP 後發 SMS 確認(索取實體副本除外);考慮對 customer-facing flow 做 end-user interview'},
+{r:'#1895',c:'QIP / TAQ',n:'p0',t:'65 歲客戶要重做 QIP',
+ d:['合資格客戶只需 review 並確認 Part 1,但 Part 2 仍要重做(分行同 online 一樣)','Online QIP 到期日唔會跟住變(原文話屬正常)'],s:''},
+{r:'#1750',c:'QIP / TAQ',n:'p0',t:'要提前提醒客戶重做 QIP(65 歲)',
+ d:['客戶 64 歲 11 個月先做 QIP,轉 65 歲後又要重做'],s:'系統 trigger 提前到 65 歲前;經多個數碼渠道提醒客戶,並由 RM 以 call lead 跟進'},
+{r:'訪談',c:'QIP / TAQ',n:'c18',t:'延遲直聯時 QIP 過期 → 直聯中斷',d:['延遲直聯期間如 QIP 到期,直聯會被中斷'],s:'RM 建議提前做 QIP 到期提醒'},
+{r:'#1473',c:'QIP / TAQ',n:'c4',t:'65 歲客戶要重做 TAQ,系統強制同一投資選項',
+ d:['客戶揀兩隻唔同產品,系統強制佢揀同一個投資選項,原文形容為「ridiculous」'],s:''},
+{r:'#1666',c:'QIP / TAQ',n:'c4',t:'延續 Phone deal 嘅 SMP 流程要重做 TAQ',
+ d:['可延續 Phone deal SMP flow,但需重做 TAQ','修改 TAQ 內容要批核(投資目的 A>B)'],s:''},
+{r:'#2104',c:'QIP / TAQ',n:'c5',t:'多產品類型同時購買(參考他行)',
+ d:['例子:ELI+SD、Fund+ELI、Fund+Bond(原文另註「find interview record」)','修改 TAQ 唔應該要任何解釋'],s:''},
+{r:'B4',c:'QIP / TAQ',n:'c4',t:'30 日內重做 TAQ 要批核',
+ d:['不現實,同交易頻率唔配(參考他行);系統亦可能偵測唔到 30 日 TAQ 而唔提醒','產品已介紹但未購買,流程會變「incomplete」'],s:'加「停止 TAQ flow」選項;呢個情況豁免重做 TAQ;原文亦提到要睇返原始文件點解咁嚴'},
+{r:'B6',c:'QIP / TAQ',n:'c4',t:'債券 + 基金合併購買:TAQ Q2 年期顯示衝突',
+ d:['基金通常 >1 年,ELI <1 年,TAQ 無法同時顯示兩者','As-is product matrix 係「等於或少於 1 年」,同問題 / 答案字眼唔對應'],s:'改用範圍,配合最合適嘅產品推薦清單'},
+{r:'B7',c:'QIP / TAQ',n:'c14',t:'ELI 年期及冷靜期',
+ d:['ELI 唔會有 >1 年;>1 年 ELI 是否要 PICOP / 售後冷靜期(原文以疑問句提出)','提及 5 日內可按原值減市場調整提取(規則有,但冇實施)'],s:'原文指實際上做得到,但要避免客戶因所謂「冷靜期」蝕錢而混淆',v:'原文帶問號,規則待核實'},
+
+{r:'#1563',c:'客戶資格 / 賬戶',n:'c1',t:'聯名賬戶下識別唔到「原有客戶」',
+ d:['可能 1:交易來人唔係聯名戶 main CIN;可能 2:交易來人從未啟動單名 63 賬戶','聯名第二人如冇單名 63 但有聯名 63,仍被定義為原有客戶(可賣)(合規角度)','用聯名 63 賬戶做投資購買,結算賬戶亦必須係聯名 63'],s:''},
+{r:'#634 / #1268 / #1889 / #1271',c:'客戶資格 / 賬戶',n:'c1',t:'Phone deal 資格及結算賬戶',
+ d:['SMP 檢查客戶可否做 Phone deal(C45 / C46);VC 唔可以做 Phone deal','C44 不同意使用存款資料;C45 拒絕人工來電直銷推廣;C46 拒絕電子渠道直銷推廣;C47 拒絕提供個人資料予集團成員作直銷推廣','引申問題:銷售流程內邊啲動作屬「直銷推廣」?要確保可用不同渠道接觸客戶(例如寄送強制文件)','#1271 同 #1889 相同'],
+ s:'#1889:SMP 流程內容許揀結算賬戶;另提到 8–9 位 RM 可做 PB 產品,要確保足夠培訓(來自 Roseline)'},
+{r:'訪談',c:'客戶資格 / 賬戶',n:'c8',t:'結算賬戶不可用,流程後段先通知',
+ d:['客戶冇可用結算賬戶時,SMP 喺流程後段先通知 RM,要離開 SMP 去 WTS 綁賬戶','原因:冇可用外幣,或 63 投資賬戶未啟動該產品','可去 WTS 63360 查賬戶、可用產品及貨幣;但有 RM 話好快搞掂'],s:''},
+{r:'B8',c:'客戶資格 / 賬戶',n:'c8',t:'揀賬戶時睇唔到賬戶結餘',d:['選擇購買賬戶時睇唔到賬戶結餘'],s:''},
+{r:'#586',c:'客戶資格 / 賬戶',n:'c2',t:'MPI 狀態判斷',
+ d:['MPI 按 BOC 內資產限制;系統唔計 off-us 同聯名資產(原文:超過 800M 應自動計為 MPI,單位以原文為準)','RM 要申請須走手動《申請建立 MPI form》','MPI flag 喺 SMP 係 T+1 更新,客戶同日更新狀態並購買 → 要額外批核(訪談)'],s:''},
+{r:'訪談',c:'客戶資格 / 賬戶',n:'c2',t:'VC 狀態由 RM 評估,上訴 flow 冇人用',
+ d:['Part 2 係揀 VC 狀態(對應投資資格):所有產品受限 / 結構性產品受限 / non-VC','VC 由 RM 按不同資料評估;現有改狀態嘅上訴 flow,但冇人用過'],s:''},
+{r:'訪談',c:'客戶資格 / 賬戶',n:'c1',t:'SMP 搵唔到聯名 / 企金賬戶',
+ d:['輸入 CIN 時,RM 搵唔到 OCRM 睇到嘅某個聯名賬戶;另一個反映搵唔到企金賬戶'],s:''},
+{r:'訪談',c:'客戶資格 / 賬戶',n:'c2',t:'SMP 錯誤訊息唔夠清晰',
+ d:['錯誤訊息未能顯示全部原因同解決方法;一宗涉及「原有客戶」問題導致流程失敗(checkbox 剔咗但無效)'],s:''},
+{r:'#1561',c:'客戶資格 / 賬戶',n:'p0',t:'客戶主動提出產品,唔應要求提供第二隻產品',
+ d:['基於 UR(推論:user research):RM 仍應嘗試建議替代產品,但客戶拒絕可 opt out(只做 execution)','CC 唔做 advisory,只可 execute;需問客戶是否要分行員工介紹;唔使介紹替代產品'],s:'',v:'UR / CC 全寫待確認'},
+{r:'訪談',c:'客戶資格 / 賬戶',n:'p0',t:'Referral 冇進度可見',
+ d:['轉介人冇方法知道現況,除非致電對方','RM 多轉介指定員工(分配落佢小區嘅 FX hub),而唔係 team lead','Digital hub 嘅 referral 唔多,數個月 1 宗'],s:''},
+{r:'訪談',c:'客戶資格 / 賬戶',n:'p0',t:'OCRM 交易紀錄難用 / RM Chat 限制',
+ d:['OCRM 交易歷史唔按基金分(排序問題),難查詢;睇唔到 P&L / 總利息,要下載月結單逐筆計','RM Chat 睇唔到前一日訊息(午夜客戶發訊 RM 收唔到),多用於定期 deals'],s:''},
+
+{r:'#1505',c:'產品資料 / 介紹',n:'c6',t:'SMP 內冇基金產品資料',
+ d:['SMP 冇基金資料;建議方案之一連結 KMP,但連結載入時間長'],s:'用 KMP 或喺產品清單旁加連結'},
+{r:'訪談',c:'產品資料 / 介紹',n:'c6',t:'介紹計時冇提示,轉頁會重置',
+ d:['SMP 唔顯示已過幾耐,RM 要按「完成介紹」先收到時間不足警示','計時中點去另一頁(準備下一產品),計時器會重新開始','Morningstar 基金資料會跳去 L-notes,員工未必可直接匯入新 email 發客戶'],s:''},
+{r:'B1',c:'產品資料 / 介紹',n:'c6',t:'睇唔到基金派息紀錄',
+ d:['每隻基金分開唔同頁,希望有統一視圖'],s:'原文標註「can handle in MLP1-2」',v:'可能屬 MLP1–2 範圍,需確認(MLP4 / MLP1–2 銜接位)'},
+{r:'B2',c:'產品資料 / 介紹',n:'c6',t:'缺每間基金公司贖回時間',
+ d:['缺贖回交易截止時間(L-note 有);必備基金資料:交易截止時間、派息 record date(完整過去及未來)、結算時間(T+?)、基金假期、貨幣假期','BOC 嘅 switching 定義同他行唔同:只限同一基金公司;唔同公司之間係 demand buy'],s:'原文標註「can handle in MLP1-2 ??」,並寫「如果係 sales journey specific 就唔係」',v:'範圍待確認'},
+{r:'B3',c:'產品資料 / 介紹',n:'c6',t:'WPS 功能想加入平台',
+ d:['WPS「我的到期產品」好用,想加入;WPS X-Ray 基金比較不能加基金'],s:''},
+{r:'#235',c:'產品資料 / 介紹',n:'c4',t:'整體減低風險:TAQ 前先提供產品資料',
+ d:['客戶主動提出指定產品(或講出產品名)時,RM 可否 email 資料'],s:'TAQ 前先向客戶提供產品資料'},
+{r:'#1614',c:'產品資料 / 介紹',n:'c7',t:'產品文件 / 表格散落多處',
+ d:['原文「Forms are 散到一地」,屬 Knowledge Centre 問題;部分文件只喺 L-notes(尤其 FFI)','原文問:暫行方案係咩?訪談要問 SMP flow 入面需要邊啲補充資料'],s:''},
+{r:'A1',c:'產品資料 / 介紹',n:'c9',t:'基金電話錄音語句',
+ d:['錄音語句字體太細;現時靠複製貼上同順序讀出,準備時間長且擔心讀錯'],s:'選項加下拉列表(pull-down menu);「7. 投資金額集中風險聲明」加超連結,方便檢閱適用語句'},
+{r:'訪談',c:'產品資料 / 介紹',n:'c12',t:'推介原因等自由輸入欄用 template',
+ d:['RM 多用 template(KMP 或 Y-drive),並盡量籠統;因為個別特殊內容通常被 BRCM 查針對性不足'],s:''},
+
+{r:'#1506 / #640 / #642',c:'基金多產品 / 轉換',n:'c5',t:'轉換 + 認購喺同一流程',
+ d:['同日購買系統唔實時更新(Prob T+1),唔反映同日多次購買嘅風險級別','2025 年 5 月 SMP release 只容許:A>B 再買 B,或 A>(B+C) 再買 C','As-is 做唔到 A>B 再買 C(最常見:介紹兩隻產品,客戶兩隻都買)','#642:同基金認購 / 轉換分兩個 flow 做,系統無法計入資產集中度','客戶去另一分行投資,資產集中度可能唔準(可能「爆」)'],
+ s:'Capture 實時 sales note(包括金額)'},
+{r:'B5',c:'基金多產品 / 轉換',n:'c5',t:'揀轉換或認購太早,無得回頭',
+ d:['產品介紹後想改認購 ↔ 轉換,RM 要重啟 SMP flow(訪談);原文話唔符客戶行為、唔合理'],s:'轉換可喺產品介紹後、購買流程內先決定'},
+{r:'#1888 / #972',c:'基金多產品 / 轉換',n:'c5',t:'一張表處理多隻基金',
+ d:['#1888:一張表認購多隻基金;#972:一頁紙表單完成多隻基金交易'],s:'同一流程內只簽一次'},
+{r:'#1890',c:'基金多產品 / 轉換',n:'c13',t:'認購中途唔可以改金額',
+ d:['基金認購唔可以中途改投資金額,要重做整個流程'],s:'提供返回掣',v:'原文問:需要 BRCM endorsement?'},
+{r:'#1899',c:'基金多產品 / 轉換',n:'c5',t:'延續 SMP 旅程嘅補充聲明',
+ d:['建議:同日內延續,只要時間超過要求,毋須補充聲明《是次交易是延續目前的銷售流程》','原本:7 日內要補充聲明;超過 7 日要重做整個 SMP 流程','6 個月內認購同一產品或結構 / 性質類近產品:毋須補充聲明、客戶確認或錄音','如何界定「類近」?(原文旁註 FFI、BR)'],s:'',v:'上述為文件內嘅方向,未確認是否已落實'},
+{r:'#629',c:'基金多產品 / 轉換',n:'c5',t:'基金重複購買(兩次間隔較長)',
+ d:['類近產品嘅銷售腳本(如風險)有共同模組,搵出嚟可減時間'],s:'訂立更多例外情況,例如重複購買、類近產品'},
+{r:'#778 / #1269',c:'基金多產品 / 轉換',n:'c5',t:'贖回基金唔可以喺 SMP 做',
+ d:['As-is:用紙本表格 + 客戶簽署','頻密 / 短期交易可喺 SMP 做,但需讀聲明(避免 RM 賺假佣);系統顯示警示,檢查錄音聲明(高風險錄音),並附 6 個月交易及 P&L excel','系統唔會阻止某些動作,所以冇防止未授權交易','頻密 / 短期定義:同一基金 3 個月內轉換 ≥2 次;3 個月內 20 宗交易;同一基金 6 個月內轉換 2 次','OCRM 只顯示過去 6 個月紀錄,RM 入 SMP 前要自己查;客戶要提供繼續原因'],s:'基金名 / 代碼、贖回限額、客戶資料放喺 SMP 會較方便'},
+{r:'訪談',c:'基金多產品 / 轉換',n:'c5',t:'贖回做法不一',
+ d:['頻密 / 短期交易:走 SMP,再 WTS 直聯(12410)','普通贖回:有 RM 先喺 OCRM 查有冇頻密 / 短期交易,直接填表再 WTS 直聯;亦有 RM 一律走 SMP 確認,再填表及 WTS'],s:''},
+
+{r:'訪談',c:'產品別流程',n:'c5',t:'ELN 銷售流程太長',
+ d:['單宗可能要半日至一整日,好多來回','FinIQ 報價 > Dummy SMP(30 分鐘)> 等 PB 產品代碼(最多 30 分鐘)> 返 SMP 完成(30 分鐘)','要離開 SMP 查「開船」情況'],s:''},
+{r:'訪談',c:'產品別流程',n:'c5',t:'CD 流程複雜易忘',
+ d:['SMP > 錄音 > WTS(輸入幾個 code,難記)> checker check;耐冇做就忘記(連 checker 都係)'],s:''},
+{r:'訪談',c:'產品別流程',n:'c5',t:'CLI 流程冇人識',
+ d:['F2F flow 少人識(連 BSM),多數轉介 FX hub,因流程唔同','錄音腳本唔配合 CLI 嘅動態價格','65+ non-VC 客戶唔可電話交易 → 永遠買唔到 CLI'],s:''},
+{r:'訪談',c:'產品別流程',n:'c5',t:'SMP 唔支援所有結構性投資',
+ d:['只支援「Target Rate Investment」(TRI,同 SD);想加 Double-no-touch、One-touch','SME 客戶用 SMP 做 SI / CLI'],s:'',v:'SD 全寫待確認'},
+{r:'B8',c:'產品別流程',n:'p0',t:'OCRM 上 SD 資料不足',
+ d:['只有到期日、金額、已收利息;冇產品代碼同佣金資料'],s:''},
+
+{r:'#1267',c:'系統 / 批核',n:'c1',t:'SMP 閒置自動登出',
+ d:['原 60 分鐘,現 90 分鐘,仍缺閒置警告;Phone deal 及 F2F 都適用;登出後要重做流程','RM 未按最後「完成」就誤關 tab,SMP flow 會丟失且搵唔返'],s:''},
+{r:'#1900',c:'系統 / 批核',n:'c20',t:'批核層級降低',
+ d:['原文:同本項目唔直接相關,屬整體營運改動;但大幅提升另類流程誘因,1/2 級批核只需 BM'],s:''},
+{r:'#1317',c:'系統 / 批核',n:'c18',t:'基金交易要多次「拉卡」(最多 4 次)',
+ d:['原文建議應合併;可能涉及 WTS(斷點);大額交易 WTS 提款有限制以防欺詐','批核門檻太高(例:認購折扣)'],s:'訪談可再問',v:'「拉卡」具體指咩操作待核實'},
+{r:'訪談',c:'系統 / 批核',n:'c21',t:'Campaign code / 同日保險及投資',
+ d:['Campaign code 只適用新客或重新啟動客戶','投資 code 錯誤 checker 可驗證;保險 checker 驗唔到,要重做整個付款 / 建議書流程','RM 反映唔可以做同日保險及投資'],s:'',v:'同日保險及投資一項原文標註「need to validate」'},
+
+{r:'#659',c:'表格 / 錄音 / 設備',n:'c17',t:'SMP 電子流程申請表日期 / 時間',
+ d:['申請表應自動填入日期 / 時間(包括「bank use only」日期 / 時間)'],s:''},
+{r:'訪談',c:'表格 / 錄音 / 設備',n:'c11',t:'簡易錄音不受歡迎',
+ d:['客戶近期喺 online 自己買完,F2F SMP flow 仍只提供完整錄音','簡易錄音冇清晰指引(幾時、點用)、慳時唔多、更易被 BRCM 查'],s:''},
+{r:'訪談',c:'表格 / 錄音 / 設備',n:'c17',t:'Sign-pad 不可靠',
+ d:['部分 RM 寧願每次印出認購表俾客戶簽'],s:''},
+{r:'訪談',c:'表格 / 錄音 / 設備',n:'c17',t:'辦公設備問題',
+ d:['RM 冇自己 laptop(後勤只有 desktop)','會議室設備多數失靈、纜線外露易斷,導致死機(要提醒客戶小心)','設備遺失 / 損壞時搵唔到負責人報告'],s:''}
+];
+
+// 產品 × 渠道 × 步驟 矩陣(來源:Investment journey product table 圖)
+// 表頭 stage 色帶跟 PPMJourneyMap 劃分(STEP 5–15 = stage 3,16–21 = stage 4);原圖表頭顏色 STEP 8–9 為 stage 4、STEP 10 為 stage 3
+// s: m = Must(黃)· c = Conditional(紫)· x = Skip(灰);顏色由我按圖判讀。 「被切」= 原圖文字被截斷。
+const MX=(function(){
+const steps=[
+ ['c1','輸入 CIN / 選擇賬戶組合',1],['c2','檢查交易來人',1],['c3','核實客戶身份 & 所在地',1],
+ ['c4','TAQ Part 1',2],['c5','產品清單',3],['c6','產品介紹',3],['c7','派發銷售文件',3],
+ ['c8','選擇交易賬戶',3],['c9','銷售錄音提示',3],['c10','TAQ Part 2',3],
+ ['c11','產品認購補充頁',3],['c12','認購產品資料輸入',3],['c13','Concentration Risk Checking',3],['c14','PICOP',3],
+ ['c15','附加客戶聲明補充頁',3],['c16','錄音提示及輸入錄音編號',4],['c17','確認及簽署',4],['c18','直聯',4],
+ ['c19','向客戶提供交易文件副本',4],['c20','審批',4],['c21','覆核及確認',4]
+].map(x=>({id:x[0],t:x[1],st:x[2]}));
+const rows=[
+ {id:'fn',fam:'Fund',sub:'nc',g:'基金 Funds',sc:'非複雜'},
+ {id:'fc',fam:'Fund',sub:'cx',g:'基金 Funds',sc:'複雜',star:1},
+ {id:'fp',fam:'Fund',sub:'private',g:'基金 Funds',sc:'私人配售'},
+ {id:'bn',fam:'Bond',sub:'nc',g:'債券 Bonds',sc:'非複雜 / 零售'},
+ {id:'bc',fam:'Bond',sub:'cx',g:'債券 Bonds',sc:'複雜',star:1},
+ {id:'bp',fam:'Bond',sub:'private',g:'債券 Bonds',sc:'私人配售 / 企業',f2f:'F2F(背對背)'},
+ {id:'cd',fam:'CD',sub:'',g:'存款證 CD',sc:''},
+ {id:'eli',fam:'ELI',sub:'',g:'股票掛鈎投資 ELI (4-5)',sc:'',star:1,dia:1},
+ {id:'eln',fam:'ELN',sub:'',g:'結構性票據 ELN (3-5)',sc:'',star:1,dia:1},
+ {id:'si',fam:'SI',sub:'',g:'結構性投資 SI',sc:'目標匯率投資',dia:1},
+ {id:'cl1',fam:'CLI',sub:'',g:'外匯掛鈎投資 CLI',sc:'期權投資',dia:1},
+ {id:'cl2',fam:'CLI',sub:'',g:'外匯掛鈎投資 CLI',sc:'雙貨幣投資',dia:1}
+];
+const R={};rows.forEach(r=>R[r.id]=r);
+const J=(...a)=>a.filter(Boolean).join(' · ');
+const f=r=>r.fam,fi=id=>R[id];
+// each step: function(rowId, ch) -> [state, note]
+const F={
+ c1:()=>['m',''],
+ c2:(r,ch)=>ch==='Phone'?['m','Check eligibility for phone deal']:
+   (r.id==='fp'?['m','MPI/ PW customer ONLY']:(r.id==='bp'||r.id==='eln'?['m','MPI customer ONLY']:['m',''])),
+ c3:(r,ch)=>ch==='Phone'?['m','Outbound call only']:['x',''],
+ c4:r=>{const y={Fund:'1 year or more',CD:'Typically 3 months - 1 yr',ELI:'1-11 months (1 months - 3 yrs)',ELN:'1 month - 1 yr'};
+   const a=r.id==='bp'?'A/B/C (Require W8BEN)':r.id==='eln'?'A/B/C (Require W8BEN for US stocks)':r.fam==='SI'?'A/B/C/D':r.fam==='CLI'?'':'A/B/C';
+   const b=r.fam==='Bond'?(r.id==='bn'?'年期:Depends':''):(y[r.fam]?'年期:'+y[r.fam]:'');
+   return ['m',J(a,b)]},
+ c5:r=>{const m={Fund:'認購/轉換/月供/贖回',CD:'IPO認購/二手市場買入/沽出',ELI:'認購 · No mismatch case',ELN:'認購 · No mismatch case',SI:'認購',CLI:'認購'};
+   if(r.fam==='Bond')return ['m',r.id==='bn'?'IPO認購/二手市場買入/沽出':r.id==='bc'?'IPO認購/二手市場買入/沽出 · No mismatch case':''];
+   return ['m',m[r.fam]]},
+ c6:(r,ch)=>{const t={fn:'>15 mins (>18 mins)',fc:'>17 mins (>20 mins)',bn:'>17 mins (>20 mins)',bc:'>17 mins (>20 mins)',cd:'>12 mins (>14 mins)',eli:'>17 mins (>20 mins)',eln:'>17 mins (>20 mins)',si:'>12 mins (>14 mins)',cl1:'>12 mins (>14 mins)',cl2:'>12 mins (>14 mins)'};
+   return ['m',J(t[r.id]||'',(r.id==='eln'&&ch==='Phone')?'Check 客戶簽…(被切)':'')]},
+ c7:(r,ch)=>{const P=ch==='Phone';let d='';
+   if(r.fam==='Fund'&&r.id!=='fp')d='a.基金說明書 b.產品資料概要 c.年報/半年報 d.基金資料單張'+(P?'(Phone via email)':'');
+   else if(r.id==='fp')d=P?'Via email':'';
+   else if(r.id==='bn'||r.id==='bc')d='a.條款概要 b.章程'+(P?' · Additionally provid…(被切) · Via email':'');
+   else if(r.id==='bp')d='a.產品概覽 b.章程 c.產品基本資料'+(P?'(Phone via email)':'');
+   else if(r.fam==='CD')d='a.資料備忘錄 b.章程 c.條款概要'+(P?'(Phone via email) · Via email':'');
+   else if(r.fam==='ELI')d='a.資料備忘錄 b.產品手冊 c.財務披露文件 d.指示性條款表 e.特定掛鈎股票名…(被切)'+(P?'(Phone via email)':'');
+   else if(r.fam==='ELN')d='a.發行人的指示性…(被切) b.披露銷售相關資…(被切) c.計劃章程大綱 d.中銀香港的指示…(被切)'+(P?'(Phone via email)':'');
+   else if(r.fam==='SI')d=P?'Via email':'a.重要資料說明 b.結構性投資條款概要';
+   else if(r.fam==='CLI')d=P?'Via email':'a.重要資料說明';
+   return ['m',d]},
+ c8:r=>['m',r.fam==='Fund'?'Detect frequent/short-term trade':''],
+ c9:(r,ch)=>r.fam==='Fund'?['x','Replaced with TTS']:
+   (r.id==='bp'?['m','']:(ch==='Phone'?['m','']:['c',r.fam==='ELI'?'Script generator':''])),
+ c10:()=>['m',''],
+ c11:(r,ch)=>{const C='Choose 錄音 option';if(ch==='Phone'||r.id==='fp'||r.id==='bp')return ['m',C];
+   if(r.id==='fc'||r.id==='bc'||r.fam==='ELI'||r.fam==='ELN')return ['c','Option to opt out w/ prereq.'];
+   return ['x','Read only']},
+ c12:()=>['m',''],
+ c13:r=>{const t={fn:'<60% (Same product type)',fc:'<60% (Same product type)',fp:'<60% (Same product type)',bn:'<60%',bc:'<20%',bp:'',cd:'<60%',eli:'<60%',eln:'<60%',si:'<80%',cl1:'<80%',cl2:'<60%'};return ['m',t[r.id]]},
+ c14:r=>['Fund','Bond','CD'].includes(r.fam)?['x','']:['c',''],
+ c15:()=>['c','條件 A–G'],
+ c16:(r,ch)=>ch==='Phone'||r.id==='fp'||r.id==='bp'?['m','']:['c',''],
+ c17:r=>['m',r.id==='bp'?'a.零售債券申請…(被切) b.有關投資產品…(被切)':''],
+ c18:r=>{let d='';if(r.fam==='Fund')d='Via FMS';else if(r.id==='bn'||r.id==='bc')d='Via BND (18100/18110 for trade, 18101 for IPO, 18320 for enquiry)';
+   else if(r.id==='bp')d='1.需先以人手… 2.收到私行通…(被切)';else if(r.fam==='ELI')d='Via BND(電郵至 "GMD_PP" 落盤? For 市場現貨價)';return ['m',d]},
+ c19:r=>{const m={Fund:'a.申請表格副本 b.客戶通知書 c.附加聲名(if need) d.QIP 副本(if need)',bn:'a.申請表格副本 c.附加聲名(if need)',bc:'a.申請表格副本 c.附加聲名(if need)',
+   bp:'a.申請表格副本 b.W-8BEN 表格 c.有關投資產品申…(被切)',CD:'a.申請表格副本 b.附加聲名(if need)',ELI:'a.申請表格副本 b.冷靜期申請表格(if need) c.附加聲名(if need)',
+   ELN:'a.申請表格副本 b.投資前冷靜期表格(if need) c.附加聲名(if need)',SI:'',CLI:'a.申請表格副本 b.投資前冷靜期表格(if need) c.附加聲名(if need)'};
+   return ['m',m[r.id]!==undefined?m[r.id]:m[r.fam]||'']},
+ c20:()=>['c',''],
+ c21:()=>['m','']
+};
+function cell(rid,ch,sid){const r=R[rid];const x=F[sid](r,ch);return {s:x[0],t:x[1]}}
+function summary(rid,ch){const c={m:0,c:0,x:0};steps.forEach(s=>c[cell(rid,ch,s.id).s]++);return c}
+function label(r){return r.g+(r.sc?' · '+r.sc:'')+(r.star?' ★':'')+(r.dia?' ◆':'')}
+return {steps,rows,R,cell,summary,label,stateName:{m:'Must 必做',c:'Conditional 視條件',x:'Skip 跳過'}};
+})();
+
+</script>
+<script>
+const META={
+ stages:[
+  {id:1,en:'Prepare & Approach',zh:'售前準備'},
+  {id:2,en:'Probe & Understand',zh:'合適性評估'},
+  {id:3,en:'Propose & Confirm',zh:'產品清單至附加客戶聲明(STEP 5–15)'},
+  {id:4,en:'Process & Assure',zh:'認購確認及售後(STEP 16–21)'}],
+ types:{gate:'前置條件 / Gate',scenario:'情境分支',exception:'例外 / Pain point',product:'產品別差異'},
+ sourceNotes:'PPMJourneyMap、Investment_Flow_As-Is、Investment_Flow_PainPoint、InvestmentFlowSummary_v2、Investment journey product table(圖)。Stage 劃分跟 PPMJourneyMap(stage 3 = STEP 5–15,stage 4 = STEP 16–21 + 售後);產品表表頭顏色將 STEP 8–9 歸 Process & Assure、STEP 10 歸 Propose & Confirm,兩者有出入,待同事確認。標「推論」「待核實」者未經確認。'
+};
+const NODES=[
+ {
+  "id": "p0",
+  "no": "表外",
+  "stage": 1,
+  "t": "售前準備 Pre-SMP(產品表以外)",
+  "d": "OCRM 跟進客戶 · QIP · WPS(選用)",
+  "time": "",
+  "src": "src",
+  "what": [
+   "喺 OCRM 跟進客戶銷售",
+   "確認客戶 QIP(Qualified Investor Profile,投資者資料)有效",
+   "必要時用 WPS 睇財富概覽(選用)",
+   "細閱售前需知、揀銷售模式"
+  ],
+  "rules": [
+   "QIP 過期 → 唔可以開始銷售流程",
+   "客戶 VC 狀態更新 → QIP 要重做",
+   "非原有客戶需客戶主動提出 (見分支)"
+  ],
+  "sys": [
+   "OCRM",
+   "QIP",
+   "WPS(optional)",
+   "RM"
+  ],
+  "link": "MLP6 Trigger / Preparation 階段嘅 output 會變成呢步嘅 input(推論,MLP6 Execution 重用 MLP4 銷售流程已確認)。",
+  "br": [
+   {
+    "id": "b1a",
+    "type": "gate",
+    "t": "QIP 過期 / VC 更新 → 重做 QIP",
+    "src": "src",
+    "cond": "QIP 過期,或客戶 VC (Vulnerable Customer) 狀態有更新",
+    "eff": [
+     "SMP 唔俾開始銷售流程",
+     "要先重做 QIP 先可以入 SMP"
+    ],
+    "pain": [
+     "#1895",
+     "#1750",
+     "#1894"
+    ],
+    "note": "65 歲客戶 QIP 重做被列為 pain point;QIP Phase II 改善另有 ticket #1894。設計機會:喺入 SMP 前提早提示 QIP 狀態。"
+   },
+   {
+    "id": "b1b",
+    "type": "gate",
+    "t": "原有客戶 vs 非原有客戶",
+    "src": "src",
+    "cond": "原有客戶 = 3 年內有啟動投資賬戶,或 3 年內有任何投資交易",
+    "eff": [
+     "原有客戶:RM 可主動跟進",
+     "非原有客戶:需要客戶主動 (客戶主動 flow),RM 唔可以主動推銷"
+    ],
+    "pain": [
+     "#1561",
+     "#1563"
+    ],
+    "note": "#1563 涉及聯名賬戶下「原有客戶」判斷。"
+   },
+   {
+    "id": "b1c",
+    "type": "scenario",
+    "t": "離線 QIP(經 Call Centre)",
+    "src": "src",
+    "cond": "客戶唔喺分行,透過 Call Centre 做 QIP",
+    "eff": [
+     "QIP 先於 SMP 完成",
+     "之後分行 RM 以有效 QIP 開始銷售"
+    ],
+    "pain": [],
+    "note": "細節(誰做、有效期)待核實。"
+   },
+   {
+    "id": "b1d",
+    "type": "scenario",
+    "t": "遙距 / RM Chat",
+    "src": "src",
+    "cond": "以 RM Chat 遙距接觸客戶",
+    "eff": [
+     "若客戶係 VC → 流程終止(唔可以用遙距)"
+    ],
+    "pain": [],
+    "note": ""
+   },
+   {
+    "id": "b1e",
+    "type": "scenario",
+    "t": "客戶主動 vs RM 主動",
+    "src": "src",
+    "cond": "誰發起今次交易",
+    "eff": [
+     "客戶主動 flow:可處理非原有客戶、單一產品介紹",
+     "RM 主動:只限原有客戶、要跟 suitability 流程",
+     "Pain point #1561:客戶主動提出產品時,唔應被要求再提供第二隻產品;RM 仍可建議替代,客戶拒絕可 opt out(只做 execution)— 此為文件內建議,非現況"
+    ],
+    "pain": [
+     "#1561"
+    ],
+    "note": "CC 唔做 advisory,只可 execute(#1561 原文)。UR / CC 全寫待確認。"
+   }
+  ]
+ },
+ {
+  "id": "c1",
+  "no": 1,
+  "stage": 1,
+  "t": "輸入 CIN / 選擇賬戶組合",
+  "d": "登入 SMP · 單名 / 聯名 · 交易模式",
+  "time": "",
+  "src": "src",
+  "what": [
+   "RM 登入 SMP(全寫見術語表)",
+   "輸入客戶 CIN,選擇賬戶組合:單名 / 聯名",
+   "選擇投資銷售流程、客戶及交易模式(F2F / Phone / 遙距)"
+  ],
+  "rules": [
+   "聯名賬戶要逐位客戶處理資格與 QIP(推論)",
+   "SMP 閒置 90 分鐘自動登出(舊為 60 分鐘),冇預警"
+  ],
+  "sys": [
+   "SMP"
+  ],
+  "br": [
+   {
+    "id": "b3a",
+    "type": "scenario",
+    "t": "聯名賬戶",
+    "src": "src",
+    "cond": "賬戶組合為聯名",
+    "eff": [
+     "需決定以邊位客戶為交易來人",
+     "原有客戶判斷以聯名邏輯處理"
+    ],
+    "pain": [
+     "#1563"
+    ],
+    "note": "#1563:聯名賬戶下「原有客戶」判斷有問題。"
+   },
+   {
+    "id": "b3c",
+    "type": "scenario",
+    "t": "客戶主動單一產品介紹",
+    "src": "src",
+    "cond": "客戶主動查詢指定單一產品",
+    "eff": [
+     "單一產品介紹 flow (single product presentation)"
+    ],
+    "pain": [],
+    "note": ""
+   },
+   {
+    "id": "b2d",
+    "type": "exception",
+    "t": "SMP 閒置登出",
+    "src": "src",
+    "cond": "閒置超過 90 分鐘(舊 60 分鐘)",
+    "eff": [
+     "無預警自動登出,要重做流程",
+     "未剔最後「完成」就誤關 tab → SMP flow 丟失且搵唔返"
+    ],
+    "pain": [
+     "#1267"
+    ],
+    "note": "設計機會:登出前倒數提示 + 草稿保留。"
+   },
+   {
+    "id": "b2e",
+    "type": "scenario",
+    "t": "選擇交易模式:面對面 / Phone Deal / 遙距",
+    "src": "src",
+    "cond": "交易發生嘅渠道",
+    "eff": [
+     "面對面:happy flow",
+     "Phone Deal:見 STEP 3",
+     "遙距:見 STEP 1 遙距 / RM Chat"
+    ],
+    "pain": [
+     "#1666"
+    ],
+    "note": ""
+   }
+  ]
+ },
+ {
+  "id": "c2",
+  "no": 2,
+  "stage": 1,
+  "t": "檢查交易來人",
+  "d": "VC · MPI · 客戶狀態 · 可否 Phone deal",
+  "time": "",
+  "src": "src",
+  "what": [
+   "系統顯示交易來人 indicators:VC、MPI、客戶狀態、投資者分類",
+   "Phone:Check eligibility for phone deal(C45 / C46 等)",
+   "顯示可行嘅銷售路徑"
+  ],
+  "rules": [
+   "VC → 走 VC 流程;VC 唔可以做 Phone deal(#634)",
+   "MPI → 可買 ELN / 公司債券;非 MPI 唔得",
+   "私人配售基金:MPI / PW customer ONLY;私人配售 / 企業債券、ELN:MPI customer ONLY(產品表)"
+  ],
+  "sys": [
+   "SMP",
+   "RM"
+  ],
+  "link": "to-be journey map 將入口檢查放 stage 1;as-is 摺入 SMP 步驟 — 屬待確認 mapping。",
+  "br": [
+   {
+    "id": "b2a",
+    "type": "gate",
+    "t": "VC (Vulnerable Customer) 流程",
+    "src": "src",
+    "cond": "客戶被標為 VC",
+    "eff": [
+     "產品介紹時間要求較長(VC 參考時間高於非 VC)",
+     "需口頭同意 Pre-Approval:BM;雙重 VC 要區長,約 1–2 日",
+     "部分分支(如遙距 / RM Chat)直接終止"
+    ],
+    "pain": [],
+    "note": "VC 流程係 BRCM 抽查重點之一(見 slide)。"
+   },
+   {
+    "id": "b2b",
+    "type": "gate",
+    "t": "MPI 狀態",
+    "src": "src",
+    "cond": "客戶 MPI 指標",
+    "eff": [
+     "ELN、公司債券只限 MPI 客戶"
+    ],
+    "pain": [
+     "#586"
+    ],
+    "prod": [
+     "ELN",
+     "CorpBond"
+    ],
+    "note": "MPI 全寫未確認(見術語表 G)。"
+   },
+   {
+    "id": "b2c",
+    "type": "gate",
+    "t": "75+ / 視障 / 聽障客戶",
+    "src": "src",
+    "cond": "客戶年齡 75 歲或以上;或視障、聽障",
+    "eff": [
+     "75+:須錄音、兩重批核、朋友或持牌員工作見證",
+     "視障 / 聽障:須錄音、見證、一重批核",
+     "65+ non-VC 唔可以電話購買"
+    ],
+    "pain": [],
+    "note": ""
+   },
+   {
+    "id": "b3b",
+    "type": "scenario",
+    "t": "Phone Deal 流程",
+    "src": "src",
+    "cond": "客戶以電話落盤",
+    "eff": [
+     "要處理文件分享、錄音",
+     "結算賬戶選擇相關 pain point 較多",
+     "電話跟進可能延續 SMP 旅程"
+    ],
+    "pain": [
+     "#634",
+     "#1268",
+     "#1889",
+     "#1666"
+    ],
+    "note": "BRCM:phone-deal 文件分享 3+4 項、錄音 3+4 項(slide 照片,數字待核實)。65+ non-VC 唔可以電話購買。",
+    "ch": "Phone"
+   }
+  ]
+ },
+ {
+  "id": "c3",
+  "no": 3,
+  "stage": 1,
+  "t": "核實客戶身份 & 所在地",
+  "d": "Phone:Outbound call only",
+  "time": "",
+  "src": "src",
+  "what": [
+   "Phone:只可由 RM 致電客戶(Outbound call only)核實身份及所在地",
+   "F2F:Skip(見面已核實)"
+  ],
+  "rules": [
+   "CID = Customer Identification(見術語表)"
+  ],
+  "sys": [
+   "RM"
+  ],
+  "link": "此步喺 as-is 文件冇詳細描述,內容只來自產品表。",
+  "br": [
+   {
+    "id": "b3x",
+    "type": "gate",
+    "t": "Phone deal:只可 Outbound call",
+    "src": "src",
+    "cond": "渠道為 Phone",
+    "eff": [
+     "RM 主動致電客戶核實身份及所在地",
+     "客戶來電(Inbound)唔適用(推論)"
+    ],
+    "pain": [
+     "#634"
+    ],
+    "note": "「客戶來電唔適用」係我對 Outbound call only 嘅推論,待核實。",
+    "ch": "Phone"
+   }
+  ]
+ },
+ {
+  "id": "c4",
+  "no": 4,
+  "stage": 2,
+  "t": "TAQ Part 1 合適性評估",
+  "d": "投資目的 · 投資年期",
+  "time": "~1–2 分鐘",
+  "src": "src",
+  "what": [
+   "問投資目的同投資年期",
+   "部分答案由 QIP 預填",
+   "系統做合適性初步判斷"
+  ],
+  "rules": [
+   "答案與 QIP 不同 → 必須填原因",
+   "產品表:投資目的選項 A/B/C(SI 為 A/B/C/D);私人配售債券需 W-8BEN,ELN(美股)需 W-8BEN;年期範圍按產品(見矩陣視圖)"
+  ],
+  "sys": [
+   "SMP",
+   "QIP"
+  ],
+  "link": "TAQ = 全寫待確認(已入 glossary)。呢步輸出會決定後面產品清單。",
+  "br": [
+   {
+    "id": "b4a",
+    "type": "gate",
+    "t": "目的與 QIP 不一致 → 要填原因",
+    "src": "src",
+    "cond": "TAQ 投資目的 ≠ QIP 內紀錄",
+    "eff": [
+     "必須輸入原因先可以繼續"
+    ],
+    "pain": [
+     "#1894"
+    ],
+    "note": "QIP Phase II 或會改變預填邏輯(待核實)。"
+   },
+   {
+    "id": "b4b",
+    "type": "scenario",
+    "t": "產品錯配 (Mismatch) flow",
+    "src": "src",
+    "cond": "客戶揀選嘅產品風險 / 年期與 TAQ 結果唔配",
+    "eff": [
+     "進入 mismatch product flow",
+     "需額外聲明 / 批核(細節待核實)"
+    ],
+    "pain": [
+     "B6"
+    ],
+    "note": "B6:債券+基金合併購買時,TAQ Q2 年期顯示衝突(基金 >1 年 / ELI <1 年)。"
+   },
+   {
+    "id": "b4c",
+    "type": "exception",
+    "t": "65 歲客戶重做 TAQ / 強制同一投資選項",
+    "src": "src",
+    "cond": "65 歲客戶重做 TAQ",
+    "eff": [
+     "客戶揀兩隻唔同產品,系統強制揀同一個投資選項"
+    ],
+    "pain": [
+     "#1473"
+    ],
+    "note": ""
+   },
+   {
+    "id": "b4d",
+    "type": "exception",
+    "t": "30 日內重做 TAQ 要批核",
+    "src": "src",
+    "cond": "30 日內再做 TAQ",
+    "eff": [
+     "需批核;系統可能偵測唔到",
+     "產品已介紹但未購買 → 流程變 incomplete"
+    ],
+    "pain": [
+     "B4"
+    ],
+    "note": "原文建議加「停止 TAQ flow」選項,並豁免重做。"
+   },
+   {
+    "id": "b4e",
+    "type": "scenario",
+    "t": "TAQ 前先提供產品資料(客戶主動指定產品)",
+    "src": "src",
+    "cond": "客戶主動提出指定產品",
+    "eff": [
+     "原文提出:RM 可否先 email 產品資料,再做 TAQ"
+    ],
+    "pain": [
+     "#235"
+    ],
+    "note": "#235 為「整體減低風險」方向,非現行流程。"
+   }
+  ]
+ },
+ {
+  "id": "c5",
+  "no": 5,
+  "stage": 3,
+  "t": "產品類別 → 產品清單",
+  "d": "揀產品類別,睇可買清單",
+  "time": "",
+  "src": "src",
+  "what": [
+   "揀產品類別(基金、債券、ELN、CD 等)",
+   "系統按資格過濾產品清單",
+   "揀定產品"
+  ],
+  "rules": [
+   "ELN 同公司債券只限 MPI",
+   "ELN 需 D-knowledge;公司債券需 W-8BEN,且唔接受文盲 / 低教育程度客戶"
+  ],
+  "sys": [
+   "SMP"
+  ],
+  "br": [
+   {
+    "id": "b5a",
+    "type": "product",
+    "t": "ELN 流程",
+    "src": "src",
+    "cond": "購買 Equity-Linked Note (ELN)",
+    "eff": [
+     "FinIQ 報價 → dummy SMP(約 30 分鐘)",
+     "向 PB 取產品代碼(≤30 分鐘)",
+     "返 SMP 完成(約 30 分鐘)",
+     "PICOP 冷靜期至少 2 個曆日"
+    ],
+    "pain": [],
+    "prod": [
+     "ELN"
+    ],
+    "note": "ELN 喺 v2 slide 有兩頁流程圖,上述時間取自 as-is;逐步細節未全部核對。"
+   },
+   {
+    "id": "b5b",
+    "type": "product",
+    "t": "公司債券 Corporate bond",
+    "src": "src",
+    "cond": "購買公司債券",
+    "eff": [
+     "需 MPI + W-8BEN",
+     "文盲 / 低教育程度客戶唔接受"
+    ],
+    "pain": [],
+    "prod": [
+     "CorpBond"
+    ],
+    "note": ""
+   },
+   {
+    "id": "b5c",
+    "type": "product",
+    "t": "零售債券 / CD / ELI / FX / SI",
+    "src": "src",
+    "cond": "非基金產品",
+    "eff": [
+     "有各自銷售流程 (v2 slide 第 12 頁)",
+     "零售債券、CD 冇 PICOP 冷靜期",
+     "CD:SMP → 錄音 → WTS → checker"
+    ],
+    "pain": [],
+    "prod": [
+     "RetailBond"
+    ],
+    "note": "ELI / FX / SI 全寫見 glossary 或待補。"
+   },
+   {
+    "id": "b5d",
+    "type": "scenario",
+    "t": "基金:轉換 + 認購 (Switching)",
+    "src": "src",
+    "cond": "客戶賣出一隻基金再買另一隻",
+    "eff": [
+     "涉及兩個交易動作",
+     "現時 SMP 處理唔順"
+    ],
+    "pain": [
+     "#1506",
+     "#640",
+     "#642"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": ""
+   },
+   {
+    "id": "b5e",
+    "type": "scenario",
+    "t": "基金:贖回 Redemption",
+    "src": "src",
+    "cond": "客戶贖回基金",
+    "eff": [
+     "贖回唔可以喺 SMP 做,現行用紙本表格 + 客戶簽署",
+     "做法不一:有 RM 先喺 OCRM 查頻密 / 短期,再填表 + WTS 直聯;有 RM 一律走 SMP"
+    ],
+    "pain": [
+     "#778",
+     "#1269"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": ""
+   },
+   {
+    "id": "b5f",
+    "type": "scenario",
+    "t": "基金:每月供款 / 延續 / 類近 / 同一產品",
+    "src": "src",
+    "cond": "每月認購;或延續、類近、同一產品再買",
+    "eff": [
+     "建議:同日內延續且時間達標 → 毋須補充聲明《是次交易是延續目前的銷售流程》",
+     "原本:7 日內要補充聲明;超過 7 日要重做整個 SMP",
+     "6 個月內認購同一或類近產品 → 免補充聲明、客戶確認、錄音(文件內方向)",
+     "「類近」如何界定:待定"
+    ],
+    "pain": [
+     "#1899",
+     "#629"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "以上為 pain-point 文件嘅方向,未確認是否已落實。"
+   },
+   {
+    "id": "b5g",
+    "type": "scenario",
+    "t": "基金:頻密 / 短期交易",
+    "src": "src",
+    "cond": "同一基金 3 個月內轉換 ≥2 次;或 3 個月內 20 宗交易;或同一基金 6 個月內轉換 2 次",
+    "eff": [
+     "可喺 SMP 做,但需讀聲明",
+     "系統顯示警示,檢查錄音聲明(高風險錄音),附 6 個月交易及 P&L excel",
+     "客戶須給繼續原因",
+     "OCRM 只顯示過去 6 個月,RM 入 SMP 前要自己查"
+    ],
+    "pain": [
+     "#778",
+     "#1269"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "三個定義取自 pain-point 文件,實際以業務定義為準。"
+   },
+   {
+    "id": "b5h",
+    "type": "scenario",
+    "t": "多產品 / 多基金同一份表",
+    "src": "src",
+    "cond": "一次買多隻基金或多種產品",
+    "eff": [
+     "一張表處理多隻基金"
+    ],
+    "pain": [
+     "#1888",
+     "#972",
+     "#2104"
+    ],
+    "note": "設計機會:批量輸入。"
+   }
+  ]
+ },
+ {
+  "id": "c6",
+  "no": 6,
+  "stage": 3,
+  "t": "產品介紹",
+  "d": "計時介紹 · 開始 / 完成 checkbox",
+  "time": "~30 分鐘",
+  "src": "src",
+  "what": [
+   "RM 向客戶介紹產品",
+   "SMP 計時;RM 剔「開始介紹」同「完成介紹」",
+   "介紹時間過短 → 系統提示 + 聲明 G"
+  ],
+  "rules": [
+   "參考最短時間(產品表):非複雜基金 >15 mins(括號 >18 mins,我推論為 VC);複雜基金、債券、ELI、ELN >17(>20);CD、SI、CLI >12(>14);私人配售冇列明",
+   "介紹過短要簽附加聲明 G(STEP 15 條件 G)"
+  ],
+  "sys": [
+   "SMP 計時器"
+  ],
+  "link": "BRCM 抽查:「產品介紹」係個人客戶出事最多類別 (11)(slide 照片,數字待核實)。",
+  "br": [
+   {
+    "id": "b6a",
+    "type": "exception",
+    "t": "介紹時間太短 → 警示 + 聲明 G",
+    "src": "src",
+    "cond": "計時低於參考分鐘數",
+    "eff": [
+     "系統警示",
+     "RM 需簽聲明 G 才可繼續"
+    ],
+    "pain": [],
+    "note": "早前 as-is 寫 4 組(15/17/12/12),產品表只有 3 級;括號數字係咪 VC,待核實。"
+   },
+   {
+    "id": "b6b",
+    "type": "exception",
+    "t": "SMP 內冇基金資料",
+    "src": "src",
+    "cond": "RM 想喺 SMP 內查基金資料",
+    "eff": [
+     "SMP 無基金產品資訊,RM 要離開系統查"
+    ],
+    "pain": [
+     "#1505"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "設計機會:SMP 內嵌產品資料。"
+   },
+   {
+    "id": "b6c",
+    "type": "gate",
+    "t": "VC 客戶 → 較長介紹時間",
+    "src": "src",
+    "cond": "客戶為 VC",
+    "eff": [
+     "最低介紹時間較長"
+    ],
+    "pain": [],
+    "note": ""
+   }
+  ]
+ },
+ {
+  "id": "c7",
+  "no": 7,
+  "stage": 3,
+  "t": "派發銷售文件",
+  "d": "說明書 · KFS · 年報",
+  "time": "",
+  "src": "src",
+  "what": [
+   "向客戶派發產品說明書、KFS(Key Facts Statement)、年報"
+  ],
+  "rules": [
+   "Phone Deal 要以其他方式提供(文件分享)"
+  ],
+  "sys": [
+   "RM"
+  ],
+  "br": [
+   {
+    "id": "b7a",
+    "type": "exception",
+    "t": "Phone Deal 文件分享",
+    "src": "inf",
+    "cond": "客戶唔喺面前",
+    "eff": [
+     "需電子 / 郵寄方式交付並留痕"
+    ],
+    "pain": [
+     "#634"
+    ],
+    "note": "BRCM 抽查有 phone-deal 文件分享事項,數字待核實。",
+    "ch": "Phone"
+   },
+   {
+    "id": "b7b",
+    "type": "exception",
+    "t": "產品文件 / 表格散落多處",
+    "src": "src",
+    "cond": "RM 搵文件",
+    "eff": [
+     "Knowledge Centre 問題;部分文件只喺 L-notes(尤其 FFI)"
+    ],
+    "pain": [
+     "#1614"
+    ],
+    "note": "原文問暫行方案係咩。"
+   }
+  ]
+ },
+ {
+  "id": "c8",
+  "no": 8,
+  "stage": 3,
+  "t": "選擇交易賬戶",
+  "d": "63 賬戶 · 結算賬戶 HKD / RMB",
+  "time": "",
+  "src": "src",
+  "what": [
+   "揀 63 賬戶(投資賬戶)",
+   "揀結算賬戶:HKD 或 RMB",
+   "基金:Detect frequent/short-term trade(產品表)"
+  ],
+  "rules": [
+   "賬戶有 roadblock 時唔可以繼續"
+  ],
+  "sys": [
+   "SMP",
+   "WTS"
+  ],
+  "br": [
+   {
+    "id": "b8a",
+    "type": "exception",
+    "t": "賬戶 roadblock (WTS 63360)",
+    "src": "src",
+    "cond": "賬戶狀態唔符合交易",
+    "eff": [
+     "流程被擋,需處理賬戶問題"
+    ],
+    "pain": [
+     "#634",
+     "#1268",
+     "#1889"
+    ],
+    "note": "#634/1268/1889 為 phone deal / 結算賬戶相關。"
+   },
+   {
+    "id": "b8b",
+    "type": "scenario",
+    "t": "基金:偵測頻密 / 短期交易",
+    "src": "src",
+    "cond": "基金交易(產品表喺「選擇交易賬戶」欄註明 Detect frequent/short-term trade)",
+    "eff": [
+     "系統偵測並提示;定義見 STEP 5「頻密 / 短期交易」",
+     "可喺 SMP 做,但需讀聲明、客戶給原因"
+    ],
+    "pain": [
+     "#778",
+     "#1269"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "as-is / pain point 文件將頻密檢測放喺贖回及產品清單位置,產品表放喺此欄,步驟位置以產品表為準(待核實)。"
+   }
+  ],
+  "link": "Stage 歸屬:PPMJourneyMap 將選擇交易賬戶放 stage 3;產品表表頭顏色則屬 Process & Assure(stage 4)。現跟 PPMJourneyMap,待同事確認。"
+ },
+ {
+  "id": "c9",
+  "no": 9,
+  "stage": 3,
+  "t": "銷售錄音提示",
+  "d": "基金以 TTS 取代",
+  "time": "",
+  "src": "src",
+  "what": [
+   "基金(含私人配售):Skip,以 TTS 取代(Replaced with TTS)",
+   "債券、CD、ELI、ELN、SI、CLI:F2F 為 Conditional,Phone 為 Must(按原圖顏色判讀)",
+   "私人配售 / 企業債券:Must;ELI F2F:Script generator"
+  ],
+  "rules": [],
+  "sys": [
+   "SMP",
+   "TTS"
+  ],
+  "link": "TTS 全寫待確認(術語表「待查證」)。Stage 歸屬:產品表表頭色屬 Process & Assure(stage 4),現跟 PPMJourneyMap 歸 stage 3,待確認。",
+  "br": [
+   {
+    "id": "b9x",
+    "type": "product",
+    "t": "基金:TTS 取代銷售錄音提示",
+    "src": "src",
+    "cond": "基金(各子類)",
+    "eff": [
+     "銷售錄音提示 Skip",
+     "改用 TTS"
+    ],
+    "pain": [],
+    "prod": [
+     "Fund"
+    ],
+    "note": "TTS 全寫待確認。"
+   },
+   {
+    "id": "b9y",
+    "type": "exception",
+    "t": "電話錄音語句(基金)",
+    "src": "src",
+    "cond": "Phone deal 基金錄音",
+    "eff": [
+     "錄音語句字體太細",
+     "靠複製貼上、順序讀出,準備時間長、擔心讀錯"
+    ],
+    "pain": [
+     "A1"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "原文建議:選項加下拉列表;「7. 投資金額集中風險聲明」加超連結。",
+    "ch": "Phone"
+   }
+  ]
+ },
+ {
+  "id": "c10",
+  "no": 10,
+  "stage": 3,
+  "t": "TAQ Part 2",
+  "d": "所有產品及渠道 Must",
+  "time": "~7 分鐘(連至 Con-risk、資料輸入)",
+  "src": "src",
+  "what": [
+   "TAQ Part 2(產品配對相關,見術語表 TAQ)",
+   "所有產品及渠道:Must"
+  ],
+  "rules": [],
+  "sys": [
+   "SMP"
+  ],
+  "link": "Stage 歸屬:產品表表頭色屬 Propose & Confirm(stage 3),夾喺 stage 4 色步驟之間;現跟 PPMJourneyMap 歸 stage 3。",
+  "br": []
+ },
+ {
+  "id": "c11",
+  "no": 11,
+  "stage": 3,
+  "t": "產品認購補充頁",
+  "d": "Read only / Opt out / Choose 錄音",
+  "time": "",
+  "src": "src",
+  "what": [
+   "F2F 非複雜產品(基金、債券、CD、SI、CLI):Read only(Skip)",
+   "F2F 複雜產品 / ELI / ELN:Option to opt out w/ prereq.(Conditional)",
+   "Phone 及私人配售:Choose 錄音 option(Must)"
+  ],
+  "rules": [],
+  "sys": [
+   "SMP"
+  ],
+  "link": "",
+  "br": [
+   {
+    "id": "b11a",
+    "type": "scenario",
+    "t": "簡易錄音 vs 完整錄音",
+    "src": "ver",
+    "cond": "按產品 / 客戶類別決定",
+    "eff": [
+     "TTS 唔支援簡易錄音"
+    ],
+    "pain": [],
+    "note": "「TTS」全寫待確認。"
+   }
+  ]
+ },
+ {
+  "id": "c12",
+  "no": 12,
+  "stage": 3,
+  "t": "認購產品資料輸入",
+  "d": "輸入金額、基金等",
+  "time": "",
+  "src": "src",
+  "what": [
+   "輸入認購產品資料(金額、基金等)"
+  ],
+  "rules": [],
+  "sys": [
+   "SMP"
+  ],
+  "link": "",
+  "br": []
+ },
+ {
+  "id": "c13",
+  "no": 13,
+  "stage": 3,
+  "t": "Concentration Risk Checking 風險集中度",
+  "d": "Con-risk 兩條問題 · 產品上限",
+  "time": "~7 分鐘(連 TAQ Part 2、資料輸入)",
+  "src": "src",
+  "what": [
+   "Q1:金額是否 ≥ 可投資資產 20%(as-is)",
+   "Q2:現金是否夠 6 個月開支(as-is)",
+   "產品表按產品設上限:基金 / CD / ELI / ELN <60%,複雜債券 <20%,SI / CLI 期權 <80%(見矩陣視圖)"
+  ],
+  "rules": [
+   "過度集中 → 需解釋並批核",
+   "按「繼續」後不能返回或改金額"
+  ],
+  "sys": [
+   "SMP"
+  ],
+  "br": [
+   {
+    "id": "b9a",
+    "type": "gate",
+    "t": "風險過度集中 → 解釋 + 批核",
+    "src": "src",
+    "cond": "Q1 為是 (≥20%) 或 Q2 為否",
+    "eff": [
+     "填寫解釋",
+     "需批核"
+    ],
+    "pain": [],
+    "note": "批核層級待核實。"
+   },
+   {
+    "id": "b9b",
+    "type": "exception",
+    "t": "繼續後不能改金額",
+    "src": "src",
+    "cond": "已按繼續進入下一頁",
+    "eff": [
+     "不能返回改認購金額",
+     "要改就要整個流程重做"
+    ],
+    "pain": [
+     "#1890"
+    ],
+    "note": "設計機會:容許返回或草稿。"
+   }
+  ],
+  "link": "as-is 嘅 20% 同產品表嘅 60% / 20% / 80% 係咪同一個檢查,待核實。"
+ },
+ {
+  "id": "c14",
+  "no": 14,
+  "stage": 3,
+  "t": "PICOP 檢查",
+  "d": "冷靜期 / 確認",
+  "time": "",
+  "src": "src",
+  "what": [
+   "PICOP 檢查(全寫見 glossary)"
+  ],
+  "rules": [
+   "ELN 冷靜期至少 2 個曆日;零售債券、CD 冇冷靜期",
+   "Opt-out 條件 (con-risk <20%、首次購買、65+) 需核實",
+   "產品表:基金、債券、CD = Skip;ELI、ELN、SI、CLI = Conditional"
+  ],
+  "sys": [
+   "SMP"
+  ],
+  "br": [
+   {
+    "id": "b10a",
+    "type": "scenario",
+    "t": "PICOP 流程 / 電話確認(ELI / ELN / SI / CLI)",
+    "src": "src",
+    "cond": "需要冷靜期",
+    "eff": [
+     "PICOP 後客戶以電話確認(約 2 日)"
+    ],
+    "pain": [],
+    "note": "產品表:PICOP 只對 ELI、ELN、SI、CLI 屬 Conditional;基金、債券、CD Skip。"
+   },
+   {
+    "id": "b10b",
+    "type": "gate",
+    "t": "PICOP opt-out 條件",
+    "src": "ver",
+    "cond": "con-risk <20%、首次購買、65+",
+    "eff": [
+     "符合者可 opt-out(待核實)"
+    ],
+    "pain": [],
+    "note": "Slide 嘅 opt-out 條件寫法未肯定,請同業務核對。"
+   }
+  ]
+ },
+ {
+  "id": "c15",
+  "no": 15,
+  "stage": 3,
+  "t": "附加客戶聲明補充頁",
+  "d": "Conditional · 條件 A–G",
+  "time": "",
+  "src": "src",
+  "what": [
+   "所有產品及渠道:Conditional",
+   "符合以下任一條件先要填:A–G(見分支)"
+  ],
+  "rules": [
+   "A 風險不配對",
+   "B 非現有客戶",
+   "C 見證人安排",
+   "D Opt out 冷靜期",
+   "E 頻密或短線基金交易",
+   "F 30 日更新 QIP",
+   "G 介紹產品時間太短"
+  ],
+  "sys": [
+   "SMP"
+  ],
+  "link": "已更正:早前版本誤寫成 VC / 75+ 相關。",
+  "br": [
+   {
+    "id": "bq15a",
+    "type": "gate",
+    "t": "A:風險不配對",
+    "src": "src",
+    "cond": "TAQ / 產品風險不配對",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [],
+    "prod": [],
+    "note": "產品錯配 flow(STEP 4)相關"
+   },
+   {
+    "id": "bq15b",
+    "type": "gate",
+    "t": "B:非現有客戶",
+    "src": "src",
+    "cond": "客戶唔屬原有客戶(3 年內冇投資賬戶 / 交易)",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [
+     "#1563"
+    ],
+    "prod": [],
+    "note": "見 STEP 0「原有客戶 vs 非原有客戶」"
+   },
+   {
+    "id": "bq15c",
+    "type": "gate",
+    "t": "C:見證人安排",
+    "src": "src",
+    "cond": "需要見證人(例如 75+ 或視障 / 聽障客戶)",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [],
+    "prod": [],
+    "note": "我推測同 75+ / VC 見證有關,原圖只寫「見證人安排」,待核實"
+   },
+   {
+    "id": "bq15d",
+    "type": "gate",
+    "t": "D:Opt out 冷靜期",
+    "src": "src",
+    "cond": "客戶 opt out PICOP 冷靜期",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [],
+    "prod": [],
+    "note": "見 STEP 14 PICOP opt-out"
+   },
+   {
+    "id": "bq15e",
+    "type": "gate",
+    "t": "E:頻密或短線基金交易",
+    "src": "src",
+    "cond": "基金頻密 / 短期交易",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [
+     "#778",
+     "#1269"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "定義及 pain point 見 STEP 5 / STEP 8"
+   },
+   {
+    "id": "bq15f",
+    "type": "gate",
+    "t": "F:30 日更新 QIP",
+    "src": "src",
+    "cond": "30 日內更新 QIP",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [
+     "B4"
+    ],
+    "prod": [],
+    "note": "與 B4「30 日內重做 TAQ」可能相關,待核實"
+   },
+   {
+    "id": "bq15g",
+    "type": "gate",
+    "t": "G:介紹產品時間太短",
+    "src": "src",
+    "cond": "產品介紹時間低於要求",
+    "eff": [
+     "需填附加客戶聲明(原圖:Required under the following conditions)"
+    ],
+    "pain": [],
+    "prod": [],
+    "note": "即 STEP 6「聲明 G」"
+   }
+  ]
+ },
+ {
+  "id": "c16",
+  "no": 16,
+  "stage": 4,
+  "t": "錄音提示及輸入錄音編號",
+  "d": "完成錄音 · 輸入編號",
+  "time": "10–15 分鐘",
+  "src": "src",
+  "what": [
+   "進行銷售錄音",
+   "輸入錄音編號",
+   "產品表:F2F 多為 Conditional,Phone 為 Must;私人配售基金 / 債券為 Must(按顏色判讀)"
+  ],
+  "rules": [
+   "錄音編號未輸入唔可以完成"
+  ],
+  "sys": [
+   "錄音系統",
+   "SMP"
+  ],
+  "link": "BRCM 抽查:錄音相關事項為個人客戶第二大類別之一(slide 數字待核實)。",
+  "br": [
+   {
+    "id": "b13a",
+    "type": "exception",
+    "t": "忘記列印銷售紀錄 → 要重做整個流程",
+    "src": "src",
+    "cond": "錄音後才發現未印銷售紀錄",
+    "eff": [
+     "整個流程重做"
+    ],
+    "pain": [],
+    "note": "與 #1614 表格處理問題相關與否未確認。"
+   }
+  ]
+ },
+ {
+  "id": "c17",
+  "no": 17,
+  "stage": 4,
+  "t": "確認及簽署",
+  "d": "列印表格 · 電子簽署 / 列印版",
+  "time": "~5 分鐘(連至直聯)",
+  "src": "src",
+  "what": [
+   "列印所需表格",
+   "客戶簽署:電子簽署(sign-pad)或列印版"
+  ],
+  "rules": [],
+  "sys": [
+   "SMP",
+   "Sign-pad",
+   "打印機"
+  ],
+  "br": [
+   {
+    "id": "b14a",
+    "type": "exception",
+    "t": "申請表日期 / 時間要手填",
+    "src": "src",
+    "cond": "SMP 電子流程產生申請表",
+    "eff": [
+     "日期 / 時間(包括「bank use only」)應自動填入"
+    ],
+    "pain": [
+     "#659"
+    ],
+    "note": "文件內建議,非現況確認。"
+   },
+   {
+    "id": "b14b",
+    "type": "exception",
+    "t": "辦公設備問題",
+    "src": "src",
+    "cond": "RM 用會議室 / 後勤設備",
+    "eff": [
+     "RM 冇自己 laptop(後勤只有 desktop)",
+     "會議室設備多數失靈、纜線外露易斷 → 死機",
+     "設備遺失 / 損壞搵唔到負責人"
+    ],
+    "pain": [],
+    "note": ""
+   },
+   {
+    "id": "b15a",
+    "type": "scenario",
+    "t": "Sign-pad vs 列印簽署",
+    "src": "src",
+    "cond": "分行有冇 sign-pad",
+    "eff": [
+     "Sign-pad 不可靠,部分 RM 寧願每次印出認購表俾客戶簽"
+    ],
+    "pain": [],
+    "note": ""
+   }
+  ]
+ },
+ {
+  "id": "c18",
+  "no": 18,
+  "stage": 4,
+  "t": "直聯",
+  "d": "FMS(基金)· BND(債券)",
+  "time": "",
+  "src": "src",
+  "what": [
+   "基金:Via FMS",
+   "債券:Via BND(18100 / 18110 交易、18101 IPO、18320 查詢)",
+   "ELI:Via BND(電郵至 \"GMD_PP\" 落盤?原圖帶問號)",
+   "as-is:WTS(見術語表)"
+  ],
+  "rules": [],
+  "sys": [
+   "FMS",
+   "BND",
+   "WTS"
+  ],
+  "br": [
+   {
+    "id": "b16a",
+    "type": "exception",
+    "t": "延遲直聯 (資金未入)",
+    "src": "src",
+    "cond": "賬戶資金未到",
+    "eff": [
+     "直聯延遲"
+    ],
+    "pain": [],
+    "note": ""
+   },
+   {
+    "id": "b16b",
+    "type": "exception",
+    "t": "基金交易要多次「拉卡」(最多 4 次)",
+    "src": "ver",
+    "cond": "基金交易",
+    "eff": [
+     "原文建議合併;可能涉及 WTS 斷點;大額交易 WTS 提款有限制以防欺詐"
+    ],
+    "pain": [
+     "#1317"
+    ],
+    "prod": [
+     "Fund"
+    ],
+    "note": "「拉卡」具體指咩操作待核實(我早前寫「直聯 key」係推論,已更正)。"
+   },
+   {
+    "id": "b16c",
+    "type": "scenario",
+    "t": "CLI 去 FX hub",
+    "src": "src",
+    "cond": "客戶以 CLI 渠道",
+    "eff": [
+     "多數去 FX hub",
+     "65+ non-VC 唔可以電話購買 → 不走 CLI"
+    ],
+    "pain": [],
+    "note": ""
+   }
+  ]
+ },
+ {
+  "id": "c19",
+  "no": 19,
+  "stage": 4,
+  "t": "向客戶提供交易文件副本",
+  "d": "申請表格副本 · 聲明 · 冷靜期表格",
+  "time": "",
+  "src": "src",
+  "what": [
+   "按產品提供:申請表格副本、客戶通知書(基金)、附加聲明(if need)、QIP 副本(基金,if need)、W-8BEN(私人配售債券)、冷靜期表格(ELI / ELN / CLI,if need)",
+   "詳細按產品見矩陣視圖"
+  ],
+  "rules": [],
+  "sys": [
+   "RM"
+  ],
+  "link": "",
+  "br": []
+ },
+ {
+  "id": "c20",
+  "no": 20,
+  "stage": 4,
+  "t": "審批",
+  "d": "按層級批核",
+  "time": "",
+  "src": "src",
+  "what": [
+   "所有產品及渠道:Conditional",
+   "依批核層級審批"
+  ],
+  "rules": [
+   "層級 1/2:BM;3:區長;4:副總"
+  ],
+  "sys": [
+   "批核系統"
+  ],
+  "br": [
+   {
+    "id": "b17a",
+    "type": "exception",
+    "t": "批核層級調低",
+    "src": "src",
+    "cond": "提案縮減批核層級",
+    "eff": [
+     "部分情況由高層降至 BM"
+    ],
+    "pain": [
+     "#1900"
+    ],
+    "note": ""
+   }
+  ]
+ },
+ {
+  "id": "c21",
+  "no": 21,
+  "stage": 4,
+  "t": "覆核及確認",
+  "d": "Checker",
+  "time": "",
+  "src": "src",
+  "what": [
+   "覆核及確認(所有產品及渠道:Must)"
+  ],
+  "rules": [],
+  "sys": [
+   "Checker"
+  ],
+  "link": "",
+  "br": [
+   {
+    "id": "b21a",
+    "type": "exception",
+    "t": "Checker 驗證 campaign / 投資 code",
+    "src": "src",
+    "cond": "有 campaign code",
+    "eff": [
+     "投資 code 錯誤,checker 可驗證",
+     "保險 code checker 驗唔到 → 要重做整個付款 / 建議書流程"
+    ],
+    "pain": [],
+    "note": "原文標註「[need to validate]」嘅同日保險及投資一項,未確認。"
+   }
+  ]
+ },
+ {
+  "id": "p22",
+  "no": "表外",
+  "stage": 4,
+  "t": "售後跟進(產品表以外)",
+  "d": "售後跟進 → 下一次 Trigger",
+  "time": "",
+  "src": "src",
+  "what": [
+   "售後跟進"
+  ],
+  "rules": [],
+  "sys": [
+   "RM"
+  ],
+  "link": "售後跟進 → MLP6 Trigger(推論)。",
+  "br": []
+ }
+];
+
+</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const TAG={src:'來源',inf:'推論',ver:'待核實'};
+
+// ---- step icons (inline SVG, 24x24 stroke) ----
+const IC={
+ clipboard:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 12h6M9 16h4"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5L16 9.5"/>',
+ pin:'<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ checks:'<path d="M4 7l1.5 1.5L8 6M4 13l1.5 1.5L8 12M4 19l1.5 1.5L8 18"/><path d="M12 7h8M12 13h8M12 19h8"/>',
+ list:'<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
+ present:'<path d="M3 4h18M5 4v10h14V4M12 14v5M8 21l4-2 4 2"/>',
+ file:'<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+ wallet:'<path d="M4 7a2 2 0 012-2h12v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="16.5" cy="13.5" r="1.2"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
+ cliptick:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9.5 14l2 2 3.5-4"/>',
+ filepen:'<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h4"/><path d="M14 3v5h5"/><path d="M13 20l1-3 6-6 2 2-6 6z"/>',
+ edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+ gauge:'<path d="M4 18a8 8 0 1116 0"/><path d="M12 18l4-6"/><circle cx="12" cy="18" r="1"/>',
+ hourglass:'<path d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"/>',
+ filetick:'<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4"/>',
+ hash:'<path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/>',
+ sign:'<path d="M3 17c3-6 5-9 7-6s0 6 3 3 3-5 5-4"/><path d="M4 21h16"/>',
+ link:'<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/>',
+ approve:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+ eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ repeat:'<path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 013-3h13"/><path d="M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 01-3 3H4"/>'
+};
+const ICON_OF={p0:'clipboard',c1:'user',c2:'shield',c3:'pin',c4:'checks',c5:'list',c6:'present',c7:'file',c8:'wallet',c9:'mic',c10:'cliptick',c11:'filepen',c12:'edit',c13:'gauge',c14:'hourglass',c15:'filetick',c16:'hash',c17:'sign',c18:'link',c19:'copy',c20:'approve',c21:'eye',p22:'repeat'};
+const TXT_IC={c4:'TAQ',c10:'TAQ'};
+const icon=id=>TXT_IC[id]?`<span class="ic txt" aria-hidden="true">${TXT_IC[id]}</span>`:`<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24">${IC[ICON_OF[id]]||IC.list}</svg></span>`;
+const lbl=n=>typeof n.no==='number'?'STEP '+n.no:n.no;
+const state={types:new Set(Object.keys(META.types)),row:'',ch:'F2F',q:'',sel:null,selBr:null,open:new Set()};
+
+// controls
+const branchTypes=Object.entries(META.types);
+$('#typeChips').innerHTML=branchTypes.map(([key,label])=>
+  `<label class="chk t-${key}"><input type="checkbox" value="${key}" checked>${esc(label)}</label>`).join('');
+$('#prodSel').innerHTML='<option value="">全部產品</option>'+MX.rows.map(r=>`<option value="${r.id}">${esc(MX.label(r))}</option>`).join('');
+$('#typeChips').addEventListener('change',e=>{
+  const {checked,value}=e.target;
+  if(checked)state.types.add(value);else state.types.delete(value);
+  const count=state.types.size;
+  $('#filterLabel').textContent=count===branchTypes.length?'分支篩選':`分支篩選 · ${count}/${branchTypes.length}`;
+  applyFilter();
+});
+const headerMenus=[...document.querySelectorAll('.header-menu')];
+document.addEventListener('click',e=>{
+  const current=e.target.closest('.header-menu');
+  for(const menu of headerMenus){
+    if(menu!==current||e.target.closest('button')){
+      if(menu.open&&menu.contains(document.activeElement))menu.querySelector('summary').focus();
+      menu.open=false;
+    }
+  }
+});
+for(const [button,dialog] of [['helpBtn','help'],['sourcesBtn','sources']]){
+  $(`#${button}`).addEventListener('click',()=>$(`#${dialog}`).showModal());
+}
+$('#prodSel').addEventListener('change',e=>{state.row=e.target.value;applyMatrix()});
+$('#chSel').addEventListener('change',e=>{state.ch=e.target.value;applyMatrix()});
+$('#q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();applyFilter()});
+function setLayout(m){document.body.classList.toggle('v',m==='v');$('#layout').textContent=m==='v'?'↕ 直向':'↔ 橫向';$('#layout').dataset.m=m;
+  try{localStorage.setItem('mlp4-layout',m)}catch(e){}hideTip(true)}
+$('#layout').onclick=()=>setLayout($('#layout').dataset.m==='v'?'h':'v');
+$('#openAll').onclick=()=>{NODES.forEach(n=>state.open.add(n.id));syncOpen()};
+$('#closeAll').onclick=()=>{state.open.clear();syncOpen()};
+const THEMES=[['light','☀ 淺色'],['dark','☾ 深色'],['auto','◐ 跟系統']];
+function setTheme(t){const r=document.documentElement;if(t==='auto')r.removeAttribute('data-theme');else r.dataset.theme=t;
+  try{localStorage.setItem('mlp4-theme',t==='auto'?'':t)}catch(e){}
+  $('#theme').textContent=THEMES.find(x=>x[0]===t)[1];$('#theme').dataset.t=t}
+setTheme(document.documentElement.dataset.theme||'auto');
+$('#theme').onclick=()=>{const i=THEMES.findIndex(x=>x[0]===$('#theme').dataset.t);setTheme(THEMES[(i+1)%3][0])};
+$('#sourceNotes').textContent=META.sourceNotes;
+// glossary slide panel
+const gs={q:'',g:'all'};
+$('#gf').innerHTML=['all'].concat(GLOSS.map(x=>x.g)).map(g=>`<button data-g="${esc(g)}" class="${g==='all'?'on':''}">${g==='all'?'全部':esc(g)}</button>`).join('');
+function stCls(s){return /文件明確|已確認/.test(s)&&!/推測/.test(s)?'ok':(/待查證|未確認|待確認/.test(s)?'w':'q')}
+function renderGloss(){
+  const q=gs.q;let h='',n=0;
+  GLOSS.forEach(grp=>{
+    if(gs.g!=='all'&&grp.g!==gs.g)return;
+    const rows=grp.r.filter(r=>!q||r.join(' ').toLowerCase().includes(q));
+    if(!rows.length)return;n+=rows.length;
+    h+=`<h4>${esc(grp.g)}</h4>`+rows.map(r=>`<div class="gi"><b>${esc(r[0])}</b><span class="lf">${esc(r[1])}</span><div class="ex">${esc(r[2])}</div><span class="st ${stCls(r[3])}">${esc(r[3])}</span></div>`).join('');
+  });
+  $('#gbody').innerHTML=h||'<p class="sub">冇符合嘅術語</p>';
+}
+function toggleGloss(force){
+  const el=$('#gloss');const on=force===undefined?!el.classList.contains('show'):force;
+  if(on){$('#pain').classList.remove('show');toggleMx(false)}
+  el.classList.toggle('show',on);
+  if(on){renderGloss();setTimeout(()=>$('#gq').focus(),260)}
+}
+$('#gbtn').onclick=()=>toggleGloss();$('#gx').onclick=()=>toggleGloss(false);
+$('#gq').addEventListener('input',e=>{gs.q=e.target.value.trim().toLowerCase();renderGloss()});
+$('#gf').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;gs.g=b.dataset.g;
+  document.querySelectorAll('#gf button').forEach(x=>x.classList.toggle('on',x===b));renderGloss()});
+renderGloss();
+
+// pain point slide panel
+const ps={q:'',c:'all'};
+$('#pf').innerHTML=['all'].concat(PAIN_CATS).map(c=>`<button data-c="${esc(c)}" class="${c==='all'?'on':''}">${c==='all'?'全部':esc(c)}</button>`).join('');
+const painByNode={};PAIN.forEach(p=>{painByNode[p.n]=(painByNode[p.n]||0)+1});
+function renderPain(){
+  const q=ps.q;let h='',n=0;
+  PAIN_CATS.forEach(cat=>{
+    if(ps.c!=='all'&&cat!==ps.c)return;
+    const rows=PAIN.filter(p=>p.c===cat&&(!q||[p.r,p.t,p.d.join(' '),p.s||'',p.v||''].join(' ').toLowerCase().includes(q)));
+    if(!rows.length)return;n+=rows.length;
+    h+=`<h4>${esc(cat)}(${rows.length})</h4>`+rows.map(p=>{const nd=nodeById(p.n);
+      return `<div class="pi"><div class="ph"><span class="ref">${esc(p.r)}</span><span class="pt">${esc(p.t)}</span></div>
+      <ul>${p.d.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+      ${p.s?`<div class="sg">原文建議:${esc(p.s)}</div>`:''}${p.v?`<div class="vf">待核實:${esc(p.v)}</div>`:''}
+      <div class="go"><button data-n="${p.n}">→ 相關步驟 ${lbl(nd)} ${esc(nd.t)}</button></div></div>`}).join('');
+  });
+  $('#pbody').innerHTML=h||'<p class="sub">冇符合嘅 pain point</p>';
+  $('#pcnt').textContent=`${n} / ${PAIN.length} 項`;
+}
+function togglePain(force,query){
+  const el=$('#pain');const on=force===undefined?!el.classList.contains('show'):force;
+  if(on){toggleGloss(false);toggleMx(false);hideTip(true)}
+  el.classList.toggle('show',on);
+  if(on){if(query!==undefined){ps.q=String(query).toLowerCase();$('#pq').value=query}renderPain();if(query===undefined)setTimeout(()=>$('#pq').focus(),260)}
+}
+$('#pbtn').onclick=()=>togglePain();$('#px').onclick=()=>togglePain(false);
+$('#pq').addEventListener('input',e=>{ps.q=e.target.value.trim().toLowerCase();renderPain()});
+$('#pf').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ps.c=b.dataset.c;
+  document.querySelectorAll('#pf button').forEach(x=>x.classList.toggle('on',x===b));renderPain()});
+$('#pbody').addEventListener('click',e=>{const b=e.target.closest('.go button');if(!b)return;
+  const id=b.dataset.n;state.open.add(id);selectNode(id);syncOpen();
+  document.querySelector(`.col[data-id="${id}"]`).scrollIntoView({inline:'center',block:'center',behavior:'smooth'});});
+document.addEventListener('click',e=>{const t=e.target.closest('.pk');if(t)togglePain(true,t.dataset.p)});
+renderPain();
+
+// render canvas
+const cv=$('#canvas');
+const runs=[];NODES.forEach(n=>{const lr=runs[runs.length-1];if(lr&&lr.st===n.stage)lr.ns.push(n);else runs.push({st:n.stage,ns:[n]})});
+runs.forEach(rn=>{
+  const st=META.stages.find(s=>s.id===rn.st),ns=rn.ns;
+  const el=document.createElement('section');el.className='stage';el.dataset.s=st.id;
+  el.innerHTML=`<h2>${st.id} · ${esc(st.en)}</h2><div class="zh">${esc(st.zh)}</div><div class="row"></div>`;
+  const row=el.querySelector('.row');
+  ns.forEach((n,i)=>{
+    const col=document.createElement('div');col.className='col';col.dataset.id=n.id;
+    col.innerHTML=`<button class="node" data-id="${n.id}">${icon(n.id)}<div class="nb"><div class="n">${lbl(n)}</div><div class="ti">${esc(n.t)}</div><div class="ds">${esc(n.d)}</div><div class="mx"></div>
+      <div class="meta">${n.time?`<span class="pill">⏱ ${esc(n.time)}</span>`:''}<span class="pill cnt">${n.br.length} 分支</span>${painByNode[n.id]?`<span class="pill pn">⚠ ${painByNode[n.id]}</span>`:''}</div></div></button>
+      <div class="lane">${n.br.map(b=>`<button class="chip ${b.type}" data-n="${n.id}" data-b="${b.id}">${esc(b.t)}<span class="tg">[${TAG[b.src]}]</span></button>`).join('')}</div>`;
+    row.appendChild(col);
+    if(i<ns.length-1){const a=document.createElement('div');a.className='arrow';row.appendChild(a)}
+  });
+  cv.appendChild(el);
+  // arrow between stages
+});
+const tip=$('#tip');let pinned=false,curEl=null;
+function placeTip(x,y){const w=tip.offsetWidth,h=tip.offsetHeight,vw=innerWidth,vh=innerHeight;let L=x+18,T=y+18;
+  if(L+w>vw-8)L=Math.max(8,x-w-18);if(T+h>vh-8)T=Math.max(8,vh-h-8);tip.style.left=L+'px';tip.style.top=T+'px'}
+function tipContent(el){return el.classList.contains('chip')?branchHTML(el.dataset.n,el.dataset.b):nodeHTML(el.dataset.id)}
+let docked=null,lastXY=[40,160];
+function clampTip(L,T){const w=tip.offsetWidth;return [Math.min(Math.max(L,4),Math.max(4,innerWidth-Math.min(w,120))),Math.min(Math.max(T,4),Math.max(4,innerHeight-40))]}
+const fitTip=T=>{tip.style.maxHeight=Math.max(160,innerHeight-T-12)+'px'};
+function showTip(el,x,y,pin){tip.style.maxHeight='';tip.innerHTML=(pin?'<div class="drag" id="tdrag" title="拖曳移動 · 雙擊重設位置">⠿ 拖曳移動(放低後唔會因點擊其他位置而關閉)</div><button class="btn close" id="tx" aria-label="關閉步驟詳情" title="關閉 (Esc)">×</button>':'')+tipContent(el);
+  tip.className='show'+(pin?' pin':'');lastXY=[x,y];
+  if(pin&&docked){const p=clampTip(docked.x,docked.y);tip.style.left=p[0]+'px';tip.style.top=p[1]+'px';fitTip(p[1])}else placeTip(x,y);
+  pinned=pin}
+// drag the pinned panel anywhere
+let drag=null;
+document.addEventListener('pointerdown',e=>{
+  if(!tip.classList.contains('pin'))return;
+  const h=e.target.closest('#tdrag,#tip h3');if(!h||e.target.closest('button,a'))return;
+  const r=tip.getBoundingClientRect();drag={dx:e.clientX-r.left,dy:e.clientY-r.top};
+  tip.classList.add('dragging');document.body.classList.add('nosel');e.preventDefault()});
+document.addEventListener('pointermove',e=>{if(!drag)return;
+  const p=clampTip(e.clientX-drag.dx,e.clientY-drag.dy);tip.style.left=p[0]+'px';tip.style.top=p[1]+'px';fitTip(p[1]);docked={x:p[0],y:p[1]}});
+const endDrag=()=>{if(!drag)return;drag=null;tip.classList.remove('dragging');document.body.classList.remove('nosel')};
+document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
+document.addEventListener('dblclick',e=>{if(!tip.classList.contains('pin')||!e.target.closest('#tdrag'))return;
+  docked=null;tip.style.maxHeight='';placeTip(lastXY[0],lastXY[1])});
+function hideTip(clearSel){tip.className='';tip.innerHTML='';pinned=false;curEl=null;
+  if(clearSel){state.sel=null;state.selBr=null;document.querySelectorAll('.node.sel,.chip.sel').forEach(x=>x.classList.remove('sel'))}}
+function mark(nid,bid){state.sel=nid;state.selBr=bid||null;
+  document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.dataset.id===nid));
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',!!bid&&c.dataset.b===bid&&c.dataset.n===nid))}
+cv.addEventListener('mouseover',e=>{if(pinned)return;const el=e.target.closest('.chip,.node');if(!el||el===curEl)return;curEl=el;showTip(el,e.clientX,e.clientY,false)});
+cv.addEventListener('mousemove',e=>{if(!pinned&&curEl)placeTip(e.clientX,e.clientY)});
+cv.addEventListener('mouseout',e=>{if(pinned)return;const to=e.relatedTarget&&e.relatedTarget.closest?e.relatedTarget.closest('.chip,.node'):null;if(!to)hideTip(false)});
+cv.addEventListener('click',e=>{
+  const chip=e.target.closest('.chip');const node=e.target.closest('.node');
+  if(chip){mark(chip.dataset.n,chip.dataset.b);showTip(chip,e.clientX,e.clientY,true);return}
+  if(node){const id=node.dataset.id;
+    if(state.sel===id&&state.open.has(id)){state.open.delete(id)}else{state.open.add(id)}
+    mark(id);syncOpen();showTip(node,e.clientX,e.clientY,true);}
+});
+document.addEventListener('click',e=>{
+  if(e.target.id==='tx'){hideTip(true);return}
+  if(e.target.closest('#tip')&&!e.target.closest('.pk'))return;
+  if(e.target.closest('.node,.chip'))return;
+  if(pinned&&!docked)hideTip(true);
+});
+
+function syncOpen(){document.querySelectorAll('.col').forEach(c=>c.classList.toggle('open',state.open.has(c.dataset.id)))}
+function nodeById(id){return NODES.find(n=>n.id===id)}
+function list(a){return a&&a.length?`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+function sec(h,body){return body?`<div><h4>${h}</h4>${body}</div>`:''}
+
+function nodeHTML(id){const n=nodeById(id);
+  return `<h3>${lbl(n)} · ${esc(n.t)} <span class="badge ${n.src}">${TAG[n.src]}</span></h3>
+   <div class="sub">${esc(n.d)}${n.time?` · 時間參考:${esc(n.time)}`:''}</div>${mxHTML(id)}
+   <div class="grid">${sec('Happy flow 做咩',list(n.what))}${sec('規則 / 門檻',list(n.rules))}${sec('系統 / 角色',list(n.sys))}${sec('接駁 (MLP6 / 上下游)',n.link?`<p>${esc(n.link)}</p>`:'')}${sec('呢步相關 Pain point',painByNode[n.id]?`<p>${PAIN.filter(p=>p.n===n.id).map(p=>`<button class="tick pk" data-p="${esc(p.r==='訪談'?p.t:p.r)}" title="${esc(p.t)}">${esc(p.r==='訪談'?'訪談:'+p.t:p.r)}</button>`).join(' ')}</p>`:'')}${sec('可展開分支',`<p>${n.br.map(b=>`<span class="tick">${esc(b.t)}</span>`).join(' ')}</p>`)}</div>`}
+function branchHTML(nid,bid){const n=nodeById(nid),b=n.br.find(x=>x.id===bid);
+  return `<h3><span class="t-${b.type}">${esc(META.types[b.type])}</span> · ${esc(b.t)} <span class="badge ${b.src}">${TAG[b.src]}</span></h3>
+   <div class="sub">喺 ${lbl(n)} ${esc(n.t)} 觸發</div>
+   <div class="grid">${sec('觸發條件',b.cond?`<p>${esc(b.cond)}</p>`:'')}${sec('流程點變 / 結果',list(b.eff))}${sec('相關 Pain point',b.pain&&b.pain.length?`<p>${b.pain.map(p=>`<button class="tick pk" data-p="${esc(p)}" title="喺 Pain point 表搵">${esc(p)}</button>`).join('')}</p>`:'')}${sec('適用產品',b.prod&&b.prod.length?`<p>${esc(b.prod.join(' / '))}</p>`:'')}${sec('備註 / 設計觀察',b.note?`<p>${esc(b.note)}</p>`:'')}</div>`}
+// keyboard / cross-link selection: highlight + pin tip under the node once scrolled into view
+function selectNode(id){mark(id);hideTip(false);
+  setTimeout(()=>{const el=document.querySelector(`.node[data-id="${id}"]`);if(!el||state.sel!==id)return;const r=el.getBoundingClientRect();showTip(el,r.left,r.bottom-10,true)},380)}
+function closeDrawer(){hideTip(true)}
+
+
+// ---- 產品 × 渠道 矩陣 ----
+function branchOk(b){
+  if(b.ch&&b.ch!==state.ch)return false;
+  const r=state.row?MX.R[state.row]:null;if(!r||!b.prod||!b.prod.length)return true;
+  return b.prod.some(t=>t==='all'||(t==='Fund'&&r.fam==='Fund')||(t==='ELN'&&r.fam==='ELN')||(t==='CorpBond'&&r.fam==='Bond'&&r.sub==='private')||(t==='RetailBond'&&r.fam!=='Fund'&&r.fam!=='ELN'&&!(r.fam==='Bond'&&r.sub==='private')))}
+const isC=id=>/^c\d+$/.test(id);
+// 未揀產品時:按渠道彙總所有產品;全部一致就顯示該狀態,否則「視產品而定」
+function aggCell(ch,sid){const cnt={m:0,c:0,x:0};const notes=new Set();
+  MX.rows.forEach(r=>{const c=MX.cell(r.id,ch,sid);cnt[c.s]++;notes.add(c.t)});
+  const kinds=['m','c','x'].filter(k=>cnt[k]>0);
+  return kinds.length===1?{s:kinds[0],t:notes.size===1?[...notes][0]:'',all:true,cnt}:{s:'mix',t:'',all:false,cnt}}
+function cellFor(id){return state.row?MX.cell(state.row,state.ch,id):aggCell(state.ch,id)}
+function mxHTML(id){if(!isC(id))return '';const c=cellFor(id);
+  if(state.row){const r=MX.R[state.row];return `<div class="mxs ms-${c.s}"><b>${esc(MX.label(r))} · ${state.ch}</b>:${MX.stateName[c.s]}${c.t?`<br>${esc(c.t)}`:''}</div>`}
+  if(c.s==='mix')return `<div class="mxs ms-mix"><b>全部產品 · ${state.ch}</b>:視產品而定(Must ${c.cnt.m} / Conditional ${c.cnt.c} / Skip ${c.cnt.x} 個產品類別)<br>揀「產品」下拉睇個別產品。</div>`;
+  return `<div class="mxs ms-${c.s}"><b>全部產品 · ${state.ch}</b>:${MX.stateName[c.s]}(所有產品一致)${c.t?`<br>${esc(c.t)}`:''}</div>`}
+function applyMatrix(){
+  const rid=state.row,ch=state.ch;
+  const tot={m:0,c:0,x:0,mix:0};
+  document.querySelectorAll('.node').forEach(nd=>{const id=nd.dataset.id,slot=nd.querySelector('.mx');
+    if(!isC(id)){nd.removeAttribute('data-ms');slot.className='mx';slot.textContent='';return}
+    const c=cellFor(id);nd.dataset.ms=c.s;tot[c.s]++;slot.className='mx on';
+    slot.innerHTML=c.s==='mix'?'<b>視產品而定</b>':`<b>${MX.stateName[c.s].split(' ')[0]}</b>${c.t?' · '+esc(c.t):''}`});
+  const sm=$('#mxsum');
+  sm.innerHTML=`<span class="lg lg-m">Must ${tot.m}</span><span class="lg lg-c">Conditional ${tot.c}</span><span class="lg lg-x">Skip ${tot.x}</span>${rid?'':`<span class="lg lg-mix">視產品而定 ${tot.mix}</span>`}`;
+  applyFilter();hideTip(true);
+}
+function buildMxTable(){
+  const stc={1:'#6fcf4f',2:'#2f9e2f',3:'#3cc7b0',4:'#6c63e8'};
+  let h='<table id="mxt"><thead><tr><th class="c0">Product</th><th class="c1">Channel</th>'+MX.steps.map((s,i)=>`<th style="border-top:6px solid ${stc[s.st]}" title="STEP ${i+1}">${i+1}. ${esc(s.t)}</th>`).join('')+'</tr></thead><tbody>';
+  MX.rows.forEach(r=>{['F2F','Phone'].forEach((ch,k)=>{
+    h+='<tr>'+(k===0?`<th class="c0" rowspan="2">${esc(MX.label(r))}</th>`:'')+`<th class="c1">${ch==='F2F'&&r.f2f?esc(r.f2f):ch}</th>`;
+    MX.steps.forEach(s=>{const c=MX.cell(r.id,ch,s.id);h+=`<td class="cs-${c.s}" data-r="${r.id}" data-ch="${ch}" data-s="${s.id}" title="${esc(MX.stateName[c.s])}">${esc(c.t)}</td>`});
+    h+='</tr>'})});
+  $('#mxwrap').innerHTML=h+'</tbody></table>';
+}
+let mxBuilt=false;
+function toggleMx(force){const el=$('#mx');const on=force===undefined?!el.classList.contains('show'):force;
+  if(on){toggleGloss(false);$('#pain').classList.remove('show');hideTip(true);if(!mxBuilt){buildMxTable();mxBuilt=true}}
+  el.classList.toggle('show',on)}
+$('#mbtn').onclick=()=>toggleMx();$('#mxx').onclick=()=>toggleMx(false);
+$('#mxwrap').addEventListener('click',e=>{const td=e.target.closest('td[data-r]');if(!td)return;
+  state.row=td.dataset.r;state.ch=td.dataset.ch;$('#prodSel').value=state.row;$('#chSel').value=state.ch;
+  applyMatrix();toggleMx(false);const id=td.dataset.s;state.open.add(id);syncOpen();selectNode(id);
+  document.querySelector(`.col[data-id="${id}"]`).scrollIntoView({inline:'center',block:'center',behavior:'smooth'})});
+
+function applyFilter(){
+  const q=state.q;
+  document.querySelectorAll('.chip').forEach(c=>{
+    const n=nodeById(c.dataset.n),b=n.br.find(x=>x.id===c.dataset.b);
+    const typeOk=state.types.has(b.type);
+    const prodOk=branchOk(b);
+    c.classList.toggle('hide',!typeOk);
+    let match=true;
+    if(q){const hay=(b.t+' '+(b.cond||'')+' '+(b.eff||[]).join(' ')+' '+(b.pain||[]).join(' ')+' '+(b.note||'')).toLowerCase();match=hay.includes(q)}
+    c.classList.toggle('dim',!(prodOk&&match));
+    if(q&&match&&typeOk)state.open.add(n.id);
+  });
+  syncOpen();
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.querySelector('dialog[open]'))return;
+  if(e.key==='Escape'){
+    const openMenu=headerMenus.find(menu=>menu.open);
+    if(openMenu){openMenu.open=false;openMenu.querySelector('summary').focus();e.preventDefault();return}
+  }
+  if(e.target.closest('header')&&e.key.startsWith('Arrow'))return;
+  if(e.key==='Escape'){if($('#mx').classList.contains('show')){toggleMx(false);return}if(pinned){hideTip(true);return}if($('#pain').classList.contains('show')){togglePain(false);if(e.target.matches('input'))e.target.blur()}else if($('#gloss').classList.contains('show')){toggleGloss(false);if(e.target.matches('input'))e.target.blur()}else closeDrawer();return}
+  if(e.target.matches('input,select'))return;
+  if((e.key==='m'||e.key==='M')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){toggleMx();e.preventDefault();return}
+  if((e.key==='p'||e.key==='P')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){togglePain();e.preventDefault();return}
+  if((e.key==='g'||e.key==='G')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){toggleGloss();e.preventDefault();return}
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'||((e.key==='ArrowDown'||e.key==='ArrowUp')&&state.sel)){
+    const i=NODES.findIndex(n=>n.id===state.sel);const fw=e.key==='ArrowRight'||e.key==='ArrowDown';
+    const j=Math.max(0,Math.min(NODES.length-1,(i<0?0:i+(fw?1:-1))));
+    const n=NODES[j];state.open.add(n.id);selectNode(n.id);syncOpen();
+    document.querySelector(`.col[data-id="${n.id}"]`).scrollIntoView({inline:'center',block:'center',behavior:'smooth'});
+    e.preventDefault();
+  }
+});
+setLayout(window.__lay==='h'?'h':'v');
+applyMatrix();
+})();
+
+</script>
+</body>
+</html>
